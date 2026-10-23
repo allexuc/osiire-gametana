@@ -6,7 +6,10 @@
 
 ## 遊ぶ
 
-- 公開URL: GitHub Pages か Cloudflare Pages で公開すると、トップページはリポジトリの一番上、各ゲームは `<公開URL>/<ゲームのフォルダ名>/` で開けます
+<!-- shelf:url -->
+- トップページ: https://allexuc.github.io/osiire-gametana/
+- 各ゲーム: `https://allexuc.github.io/osiire-gametana/<ゲームのフォルダ名>/` (例: [札上の楼閣](https://allexuc.github.io/osiire-gametana/satsujo/))
+<!-- /shelf:url -->
 - 手元で確かめる: リポジトリの一番上で `python3 -m http.server 8000` を実行し、`http://localhost:8000/` を開く
 
 ## ゲーム一覧
@@ -14,7 +17,7 @@
 <!-- shelf:games -->
 | ゲーム | ジャンル | 1回の長さ | 遊ぶ |
 | --- | --- | --- | --- |
-| **札上の楼閣**（さつじょうのろうかく）<br>積めば強い。崩せば、もっと強い。 | デッキ構築ローグライク | 30分前後（途中で中断できます） | 公開後にURLが入ります<br>[説明](satsujo/README.md) |
+| **札上の楼閣**（さつじょうのろうかく）<br>積めば強い。崩せば、もっと強い。 | デッキ構築ローグライク | 30分前後（途中で中断できます） | [遊ぶ](https://allexuc.github.io/osiire-gametana/satsujo/)<br>[説明](satsujo/README.md) |
 <!-- /shelf:games -->
 
 ## フォルダ構成

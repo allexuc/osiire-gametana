@@ -316,6 +316,14 @@ def write_readme_list(cfg, pub, base):
         rows.append('| (まだありません) | | | |')
     block = start + '\n' + '\n'.join(rows) + '\n' + end
     out = src[:src.index(start)] + block + src[src.index(end) + len(end):]
+    us, ue = '<!-- shelf:url -->', '<!-- /shelf:url -->'
+    if us in out and ue in out:
+        if base:
+            ex = f'(例: [{pub[0]["title"]}]({base}{pub[0]["id"]}/))' if pub else ''
+            lines = f'- トップページ: {base}\n- 各ゲーム: `{base}<ゲームのフォルダ名>/` {ex}'.rstrip()
+        else:
+            lines = '- 公開URL: GitHub Pages か Cloudflare Pages で公開すると、トップページはリポジトリの一番上、各ゲームは `<公開URL>/<ゲームのフォルダ名>/` で開けます'
+        out = out[:out.index(us)] + us + '\n' + lines + '\n' + ue + out[out.index(ue) + len(ue):]
     return write_if_changed(p, out)
 
 
