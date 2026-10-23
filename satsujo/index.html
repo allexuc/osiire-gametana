@@ -14,12 +14,11 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="札上の楼閣">
 <meta property="og:description" content="トランプで楼閣を積み、崩れ落ちる札まで武器にして戦うデッキ構築ローグライク。子供部屋から台所、居間へ。全3章を抜けて、家じゅうの災難を乗り越えよう。">
-<meta property="og:image" content="https://allexuc.github.io/osiire-gametana/satsujo/og.png">
-<meta property="og:url" content="https://allexuc.github.io/osiire-gametana/satsujo/">
+<meta property="og:image" content="og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="札上の楼閣">
 <meta name="twitter:description" content="トランプで楼閣を積み、崩れ落ちる札まで武器にして戦うデッキ構築ローグライク。子供部屋から台所、居間へ。全3章を抜けて、家じゅうの災難を乗り越えよう。">
-<meta name="twitter:image" content="https://allexuc.github.io/osiire-gametana/satsujo/og.png">
+<meta name="twitter:image" content="og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&family=Yusei+Magic&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
@@ -246,6 +245,8 @@ button{font:inherit;color:inherit}
 .banner.trick{top:44vh;background:var(--accent);color:var(--accent-ink);font-size:26px;box-shadow:0 8px 20px -10px rgba(10,14,28,.6)}
 .banner.hot.trick{background:var(--hp)}
 .sub.ver{text-align:center;margin-top:-4px}
+/* 予備の札: 白紙の札。内側に点線の枠 */
+.card.spare::before{content:"";position:absolute;inset:4px;border:1px dashed var(--paper-edge);border-radius:4px;pointer-events:none}
 </style>
 </head>
 <body>
@@ -277,6 +278,7 @@ const CARDS={};
  ['hQ','H',12,1,{multiply:1},0,'r','増殖のクイーン'],['hK','H',13,2,{shuffle:1},0,'r','模様替えのキング'],['h10','H',10,1,{heal:2},{cheer:2},'r','拍手の10'],
  ['jk','J',0,1,{},{float:1,echo:1},'r','ジョーカー'],['jf','J',0,1,{flip:1},{float:1},'r','ちゃぶ台返し'],['jm','J',0,1,{swap:1},{float:1},'r','手品師のジョーカー'],
  ['dust','X',0,1,{},{dust:1},'x','ホコリ'],
+ ['spare','X',0,1,{grd:2},{spare:1},'x','予備の札'],
 ].forEach(([id,s,r,cost,fx,kw,rar,name])=>{CARDS[id]={id,s,r,cost,fx:fx||{},kw:kw||{},rar,name:name||''};});
 const POOL={c:[],u:[],r:[]};for(const id in CARDS){const r=CARDS[id].rar;if(POOL[r])POOL[r].push(id);}
 const DOODLES={
@@ -387,7 +389,7 @@ const UNLOCKS=[
 const NODE_NAME={battle:'戦闘',elite:'強敵',rest:'休憩',shop:'店',event:'出来事',treasure:'宝箱',boss:'ボス'};
 const FLOOR_TYPES=[null,['battle'],['battle','battle','event'],['battle','shop','event'],['elite','rest','battle'],['treasure','event','battle'],['battle','elite','shop'],['rest','shop','rest'],['boss']];
 const TS=[0,4,7,9],TL=[4,3,2,1],MULT=[1,2,3,4];
-const FALL=2,BOOM=15,SPIT=4,MIN_DECK=8;
+const FALL=2,BOOM=15,SPIT=4,MIN_DECK=10;  // 楼閣は10マス。デッキが10枚ないと完成できず、札が塔に残ったまま手札が尽きる
 const SELL={st:12,c:20,u:35,r:55,x:0};
 const tierOf=k=>k>=9?3:k>=7?2:k>=4?1:0;
 function sups(k){const t=tierOf(k);if(!t)return[];const p=k-TS[t];return[TS[t-1]+p,TS[t-1]+p+1];}
@@ -490,6 +492,7 @@ function desc(c){const F=c.fx,K=c.kw,L=[];
  if(K.pierce)L.push('貫通');if(K.aura)L.push('支援+'+K.aura+'(上に置く札の倍率+'+K.aura+')');if(K.cheer)L.push('応援(次に置く札の倍率+'+K.cheer+')');
  if(K.float)L.push('浮遊(支えなしで置ける)');if(K.echo)L.push('再演(直前に置いた札をこの段の倍率で発動)');
  if(K.steady)L.push('不動(ノックで落ちない)');if(K.base)L.push('土台専用');if(K.dust)L.push('効果なし');
+ if(K.spare)L.push('予備の札(デッキが'+MIN_DECK+'枚に足りない戦闘だけ、足りない分が入る。戦闘が終わると消える)');
  return L.join('・');}
 const actVal=(x,e)=>Math.round(x.v*(e.am||1))+(e.str||0);
 function actLabel(x,e){switch(x.a){case'atk':return'攻撃 '+actVal(x,e)+(x.n>1?'×'+x.n:'');case'gust':return'突風 '+x.v;case'quake':return'揺れ '+x.v;case'snipe':return'狙い';case'damp':return'湿気';case'block':return'防御 '+x.v;case'str':return'強化 '+x.v;case'dust':return'ホコリ '+x.v;case'suck':return'吸引 '+x.v;case'spit':return'吐き出し '+e.bag.length+'枚';case'heal':return'回復 '+x.v;case'scramble':return'かき回し';case'chill':return'かじかみ '+x.v;}return'';}
@@ -599,7 +602,11 @@ function startBattle(run,eid,f){const E=ENEMIES[eid],C=CHAPTERS[run.ch],lv=run.l
   draw:shuffle(run.rng,run.deck.map(x=>({u:x.u,d:x.d,up:x.up,dd:x.dd||''}))),hand:[],disc:[],tower:Array(10).fill(null),
   en:{hp,max:hp,blk:0,str,am,step:0,mark:-1,bag:[]},last:null,crowns:0,over:'',
   placed:0,hang:0,rev:0,hana:{},trump:'',tarot:'',bet:0,moonShown:0};
- const b=run.b,tmpCard=()=>{const p=POOL.c.concat(POOL.u).filter(id=>!run.lockC.includes(id));b.draw.push({u:-(++b.tmpN),d:pick(run.rng,p),up:0,dd:randDoodle(run),tmp:1});};
+ const b=run.b,lack=Math.max(0,MIN_DECK-run.deck.length);
+ // デッキが10枚に足りないとき(古いセーブなど)は、戦闘のあいだだけ予備の札で補う
+ for(let i=0;i<lack;i++)b.draw.push({u:-(++b.tmpN),d:'spare',up:0,dd:'',tmp:1});
+ if(lack){shuffle(run.rng,b.draw);b.spare=lack;}
+ const tmpCard=()=>{const p=POOL.c.concat(POOL.u).filter(id=>!run.lockC.includes(id));b.draw.push({u:-(++b.tmpN),d:pick(run.rng,p),up:0,dd:randDoodle(run),tmp:1});};
  if(has(run,'gacha'))tmpCard();
  if(has(run,'trump'))b.trump=pick(run.rng,[...NAT]);
  if(has(run,'tarot')){b.tarot=pick(run.rng,TAROT_KEYS);if(b.tarot==='wheel'){tmpCard();tmpCard();}if(b.tarot==='death')b.en.hp=Math.max(1,b.en.hp-Math.round(b.en.max*.15));}
@@ -801,7 +808,7 @@ function memOf(run){const floors=(run.ch-1)*8+run.floor;return Math.round((floor
 // ==ENGINE END==
 // ---------- UI ----------
 const app=document.getElementById('app');
-const VERSION='1.0.1';
+const VERSION='1.0.2';
 const KEY_RUN='satsujo-run-v3',KEY_META='satsujo-meta-v3',KEY_TUT='satsujo-tut-v3';
 const store={get(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}},del(k){try{localStorage.removeItem(k);}catch(e){}}};
 const META0=()=>({total:0,runs:0,wins:0,best:0,maxLv:0,cleared:{},seen:{c:[],r:[],e:[]},all:false,sound:true,fast:false,daily:null,last:{troupe:'spade',lv:0}});
@@ -856,11 +863,11 @@ const HELP=`<ol class="help">
 </ol>
 <p class="suits"><span>♠ 攻撃</span><span class="r">♦ 守り</span><span>♣ 補強</span><span class="r">♥ 回復</span><span>★ ジョーカー</span></p>`;
 function cardHTML(c,o){o=o||{};const su=SUIT[c.s];
- const cls=['card',su.red?'red':'',c.s==='J'?'joker':'',c.s==='X'?'dust':'',c.up?'up':''].join(' ');
+ const cls=['card',su.red?'red':'',c.s==='J'?'joker':'',c.s==='X'?(c.kw.spare?'spare':'dust'):'',c.up?'up':''].join(' ');
  const lines=fxLines(c,o.small?0:o.big?2:1).slice(0,o.small?2:o.big?4:3);const rk=c.s==='J'?'★':RANKN(c.r);
  return`<span class="${cls}"><span class="cor"><span class="rk">${rk}</span><span class="st">${c.s==='J'||c.s==='X'?'':su.sym}</span></span>`+
   (o.mult?`<span class="mb">×${o.mult}</span>`:`<span class="cost${o.cost!=null&&o.cost<c.cost?' free':''}">${o.cost!=null?o.cost:c.cost}</span>`)+
-  `<span class="pip">${c.s==='X'?'塵':c.s==='J'?'★':su.sym}</span>`+
+  `<span class="pip">${c.s==='X'?(c.kw.spare?'予':'塵'):c.s==='J'?'★':su.sym}</span>`+
   (c.dd?`<span class="dd dd-${c.dd}">${DOODLES[c.dd].g}</span>`:'')+
   (o.big&&(c.name||c.up)?`<span class="nm">${label(c)}</span>`:'')+
   `<span class="fx">${lines.map(s=>`<span>${s}</span>`).join('')}</span></span>`;}
@@ -903,6 +910,7 @@ function preview(run,c,k,m){const b=run.b,F=c.fx,tc=towerCount(b)+1,r=c.kw.twice
  if(F.dmg)return'攻'+F.dmg*m*r;if(F.dmgT)return'攻'+F.dmgT*tc*m*r;if(F.grd)return'守'+F.grd*m*r;if(F.grdT)return'守'+F.grdT*tc*m*r;
  if(F.brc)return'補'+F.brc*m*r;if(F.heal)return'回'+F.heal*m*r;if(F.healT)return'回'+F.healT*tc*m*r;if(F.draw)return'引'+F.draw;return'';}
 function hint(run){const b=run.b;if(S.sel>=0&&b.hand[S.sel]){const c=cdata(b.hand[S.sel]),co=costOf(run,c);return`${label(c)}: ${desc(c)}(コスト${co}${co<c.cost?'・ストップウォッチで0':''}・ランク${c.r})。光ったマスに置ける。`;}
+ if(!b.hand.length)return b.draw.length||b.disc.length?'手札を使い切った。「ターン終了」で次の札を引ける。':'引ける札が残っていない。塔の札をタップして「崩す」と、落ちた札は捨て札に回り、次のターンにまた引ける。';
  return b.turn===1&&!towerCount(b)?'まず1段目に札を置こう。落ちた札も敵に当たるので、崩されても無駄にはならない。':'札を選んで、光ったマスに積む。塔の札をタップすると「崩す」ができる。';}
 function vBattle(){const run=S.run,b=run.b,e=b.en,E=ENEMIES[b.eid],pat=E.pat[e.step];
  const th=S.snap?{}:threats(run),sel=S.sel>=0&&b.hand[S.sel]?S.sel:-1,selC=sel>=0?cdata(b.hand[sel]):null;
@@ -940,7 +948,7 @@ function vShop(){const c=S.ctx,run=S.run;return`${hudRun()}<section class="panel
  <div class="grid big">${c.cards.map((x,i)=>`<button class="hc" ${x.sold?'disabled':`data-act="buy" data-i="${i}"`} aria-label="${label(offerC(x))} ${x.p}ボタン">${cardHTML(offerC(x),{big:1})}<span class="price${run.btn<x.p&&!x.sold?' short':''}">${x.sold?'購入済み':x.p+'ボタン'}</span></button>`).join('')}</div>
  <div class="list">${c.trs.map((x,i)=>`<button class="row-btn" ${x.sold?'disabled':`data-act="buytr" data-i="${i}"`}><b>${trName(x.id)}</b><span>${TRINKETS[x.id].desc}</span><em>${x.sold?'購入済み':x.p+'ボタン'}</em></button>`).join('')}
  <button class="row-btn" ${c.ddUsed?'disabled':'data-act="ddsvc"'}><b>落書き屋「${DOODLES[c.dd].n}」</b><span>${DOODLES[c.dd].d}。札1枚に描いてもらう</span><em>${c.ddUsed?'利用済み':c.ddP+'ボタン'}</em></button>
- <button class="row-btn" data-act="sellsvc"><b>札を売る</b><span>デッキの札をボタンに換える。何枚でも売れるが、デッキは${MIN_DECK}枚より減らせない</span><em>${c.soldN?`${c.soldN}枚 +${c.earned}`:'買い取り'}</em></button></div>
+ <button class="row-btn" data-act="sellsvc"><b>札を売る</b><span>デッキの札をボタンに換える。楼閣を完成させるのに${MIN_DECK}枚いるので、デッキは${MIN_DECK}枚より減らせない</span><em>${c.soldN?`${c.soldN}枚 +${c.earned}`:'買い取り'}</em></button></div>
  <button class="btn pri wide" data-act="next">店を出る</button></section>`;}
 function vRest(){const run=S.run,h=restHeal(run);return`${hudRun()}<section class="panel scr"><p class="kicker">${run.ch}-${run.floor}・マッチ箱のベッド</p><h2 class="h2">ひと休み</h2>
  <p class="text">マッチ箱のベッドで体を休めるか、アイロンで札の折れ目を伸ばして強くするか。</p>
@@ -962,7 +970,7 @@ function vWin(){const r=S.run,e=S.end||{};return`<main class="title"><p class="k
 function vDex(){const tab=S.ov.tab||'c',seen=meta.seen;
  const tabs=[['c','札'],['r','ガラクタ'],['e','敵'],['s','記録']].map(([k,n])=>`<button class="tab${tab===k?' on':''}" data-act="dextab" data-t="${k}">${n}</button>`).join('');
  let body='';
- if(tab==='c'){const ids=Object.keys(CARDS).filter(id=>id!=='dust');body=`<p class="sub">${ids.filter(id=>seen.c.includes(id)).length}/${ids.length}種を見つけた。札をタップすると説明が出る。</p><div class="grid dex">${ids.map(id=>seen.c.includes(id)?`<button class="hc" data-act="dexcard" data-d="${id}" aria-label="${label(CARDS[id])}">${cardHTML(cdata({d:id}))}</button>`:`<span class="card unk"><span class="pip">?</span></span>`).join('')}</div>`;}
+ if(tab==='c'){const ids=Object.keys(CARDS).filter(id=>CARDS[id].rar!=='x');body=`<p class="sub">${ids.filter(id=>seen.c.includes(id)).length}/${ids.length}種を見つけた。札をタップすると説明が出る。</p><div class="grid dex">${ids.map(id=>seen.c.includes(id)?`<button class="hc" data-act="dexcard" data-d="${id}" aria-label="${label(CARDS[id])}">${cardHTML(cdata({d:id}))}</button>`:`<span class="card unk"><span class="pip">?</span></span>`).join('')}</div>`;}
  if(tab==='r'){const ids=Object.keys(TRINKETS);body=`<p class="sub">${ids.filter(id=>seen.r.includes(id)).length}/${ids.length}種を見つけた</p><div class="dexlist">${ids.map(id=>seen.r.includes(id)?`<div><b>${TRINKETS[id].name}</b>${TRINKETS[id].g?`<em>遊び道具・${TRINKETS[id].g}</em>`:''}<span>${TRINKETS[id].desc}</span></div>`:`<div><b>???</b>${TRINKETS[id].g?'<em>遊び道具</em>':''}<span>まだ見つけていない</span></div>`).join('')}</div>`;}
  if(tab==='e'){body=[1,2,3].map(ch=>`<p class="chap">第${ch}章 ${CHAPTERS[ch].name}</p><div class="dexlist">${Object.keys(ENEMIES).filter(id=>ENEMIES[id].ch===ch).map(id=>{const E=ENEMIES[id];return seen.e.includes(id)?`<div><b>${E.name}</b><em>${E.tier==='boss'?'ボス':E.tier==='elite'?'強敵':'通常'}・HP${E.hp}</em><span>${E.say}</span></div>`:'<div><b>???</b><span>まだ出会っていない</span></div>';}).join('')}</div>`).join('');}
  if(tab==='s'){const d=meta.daily;body=`<dl class="stats"><div><dt>挑戦</dt><dd>${meta.runs}</dd></div><div><dt>クリア</dt><dd>${meta.wins}</dd></div><div><dt>最大の一撃</dt><dd>${fmt(meta.best)}</dd></div><div><dt>思い出</dt><dd>${fmt(meta.total)}</dd></div></dl>
@@ -1051,7 +1059,7 @@ function openView(title,insts){S.ov={mode:'view',title,pick:0,cards:sortInsts(in
 function startRun(seed,o,msg){S.run=newRun(seed,o);S.ov=null;S.sel=-1;S.focus=-1;S.end=null;toMap(msg);}
 function enterNode(f,i){const run=S.run,n=run.map.fl[f][i];run.floor=f;run.node=i;n.done=1;S.msg='';S.sel=-1;S.focus=-1;window.scrollTo(0,0);
  if(n.t==='battle'||n.t==='elite'||n.t==='boss'){const eid=pickEnemy(run,n.t,f),b=startBattle(run,eid,f);startTurn(run);see('e',[eid]);S.scr='battle';
-  S.msg=ENEMIES[eid].say+(b.tarot?` タロットは「${TAROT[b.tarot].n}」: ${TAROT[b.tarot].d}。`:'')+(b.trump?` 切り札は${SUIT[b.trump].sym}。`:'')+(b.bet?` ${b.bet}ボタンを賭けた。`:'');S.deal=1;render();S.deal=0;
+  S.msg=ENEMIES[eid].say+(b.spare?` デッキが${MIN_DECK}枚に足りないので、この戦闘だけ予備の札を${b.spare}枚足した。`:'')+(b.tarot?` タロットは「${TAROT[b.tarot].n}」: ${TAROT[b.tarot].d}。`:'')+(b.trump?` 切り札は${SUIT[b.trump].sym}。`:'')+(b.bet?` ${b.bet}ボタンを賭けた。`:'');S.deal=1;render();S.deal=0;
   if(n.t==='boss')banner(run.ch===3?'最終戦':'第'+run.ch+'章 ボス');if(!store.get(KEY_TUT)){store.set(KEY_TUT,1);S.ov={mode:'help'};render();}return;}
  if(n.t==='rest')S.scr='rest';
  else if(n.t==='shop'){S.ctx=genShop(run);see('c',S.ctx.cards.map(x=>x.d));see('r',S.ctx.trs.map(x=>x.id));S.scr='shop';if(S.ctx.bonus)SFX.play('coin');}

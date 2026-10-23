@@ -1,7 +1,7 @@
 // 札上の楼閣 のオフライン用キャッシュ(tools/shelf.py build が作成。直接編集しない)
 // ゲームのページ: ネット優先(つながっていれば常に最新)。ほかのファイルとフォント: キャッシュを先に返して裏で更新
 const PREFIX='satsujo-';
-const CACHE=PREFIX+'v1.0.1';
+const CACHE=PREFIX+'v1.0.2';
 const HOME=new URL('./',self.location).pathname;
 const CORE=["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});

@@ -1,6 +1,6 @@
 // Headless check v3 for 札上の楼閣 (完全版): syntax, engine invariants over 3 chapters, troupes, levels, selling, and balance with a greedy bot.
 // usage: node tools/sim.js index.html [runs] [level] [troupe|all] [locked]
-// env: HACHA=1 (ハチャメチャ箱), RELICS=poker,tarot (最初から持たせるガラクタ), ALLGAMES=1 (遊び道具を全部), TB=1 (一座ごとのボス戦), TRICKS=1 (役の回数)
+// env: HACHA=1 (ハチャメチャ箱), RELICS=poker,tarot (最初から持たせるガラクタ), ALLGAMES=1 (遊び道具を全部), TB=1 (一座ごとのボス戦), TRICKS=1 (役の回数), THIN=10 (デッキを10枚まで売って薄くする), LEGACY=8 (10枚未満の古いセーブで始める)
 const fs=require('fs'),vm=require('vm');
 const src=fs.readFileSync(process.argv[2],'utf8'),N=+(process.argv[3]||400),LV=+(process.argv[4]||0),TR=process.argv[5]||'all',LOCKED=process.argv[6]==='locked';
 const js=src.split('<script>').map(s=>s.split('</script>')[0]).find(s=>s.includes('==ENGINE START=='));
@@ -54,6 +54,7 @@ function placeLoop(run,lim){const b=run.b;let n=0;
   if(!best||best.sc<=0)break;if(typeof E.trickPreview(run,best.hi,best.k)!=='string')throw new Error('trickPreview');const fx=E.placeCard(run,best.hi,best.k);if(!fx)throw new Error('placeCard null for a legal move');countFx(fx);check(run);}}
 function canAny(run){const b=run.b;for(let hi=0;hi<b.hand.length;hi++)for(let k=0;k<10;k++)if(E.canPlace(run,hi,k).ok)return true;return false;}
 function aiTurn(run){const b=run.b;placeLoop(run,25);
+ if(!b.over&&!b.hand.length&&!b.draw.length&&!b.disc.length&&E.towerCount(b)<10)ST.locked=(ST.locked||0)+1;
  for(let g=0;g<3&&!b.over&&b.act>=1;g++){let bd=null;for(let k=0;k<10;k++){if(!b.tower[k])continue;const e=estDemo(run,k);if(!bd||e.dmg>bd.dmg)bd=Object.assign({k},e);}
   if(!bd)break;const inc=E.incoming(run);
   const lethal=bd.dmg>=b.en.hp+b.en.blk,doomed=inc.knocks>b.brc&&bd.bombs>0&&bd.dmg>=20;
@@ -62,7 +63,7 @@ function aiTurn(run){const b=run.b;placeLoop(run,25);
   if(stall)placeLoop(run,10);}
  if(!b.over&&!b.wedge&&b.hand.length){const inc=E.incoming(run);if(inc.knocks>b.brc&&E.towerCount(b)>=2){E.wedgeCard(run,0);check(run);}}}
 const S=k=>ST.en[k]||(ST.en[k]={n:0,win:0,turns:0,loss:0});
-function fight(run,eid,f){E.startBattle(run,eid,f);const hp0=run.hp;let turns=0;const tb=E.ENEMIES[eid].tier==='boss'?(ST.tb[run.troupe+':'+eid]||(ST.tb[run.troupe+':'+eid]={n:0,win:0,hp:0})):null;if(tb){tb.n++;tb.hp+=run.hp;}
+function fight(run,eid,f){E.startBattle(run,eid,f);if(run.b.spare)ST.spares=(ST.spares||0)+run.b.spare;const hp0=run.hp;let turns=0;const tb=E.ENEMIES[eid].tier==='boss'?(ST.tb[run.troupe+':'+eid]||(ST.tb[run.troupe+':'+eid]={n:0,win:0,hp:0})):null;if(tb){tb.n++;tb.hp+=run.hp;}
  while(!run.b.over&&turns<60){turns++;E.startTurn(run);check(run);aiTurn(run);if(run.b.over)break;const fx=E.endTurn(run);countFx(fx);check(run);E.threats(run);
   for(const x of E.ENEMIES[eid].pat[run.b.en.step]){if(!E.actLabel(x,run.b.en)||!E.actDesc(x,run.b.en))throw new Error('intent text');}}
  const r=run.b.over||'timeout',s=S(eid);if(tb&&r==='win')tb.win++;if(r==='timeout')ST.timeouts++;s.n++;s.turns+=turns;s.loss+=hp0-run.b.hp;if(r==='win')s.win++;return r;}
@@ -72,12 +73,14 @@ function takeReward(run,rw){ST.battleBtn+=rw.btn;const os=rw.cards.slice().sort(
 function chooseNode(run,av){const pref=n=>n.t==='rest'?(run.hp<run.maxHp*0.55?5:1):n.t==='elite'?(run.hp>run.maxHp*0.7?3:-2):n.t==='shop'?(run.btn>=70?3:0):n.t==='treasure'?4:2;
  let best=av[0],bs=-99;for(const a of av){const n=run.map.fl[a[0]][a[1]];const p=pref(n)+E.rnd(run.rng)*0.5;if(p>bs){bs=p;best=a;}}return best;}
 const WEAK=['dust','s2','d2','c2','h2','s3','d3'];
-function sellJunk(run,maxSell,mul){let n=0;
- for(const id of WEAK){while(n<maxSell&&run.deck.length>Math.max(E.MIN_DECK,id==='dust'?0:13)){const x=run.deck.find(c=>c.d===id&&!c.up&&!c.dd);if(!x)break;const p=E.sellCard(run,x.u,mul);if(p<0)throw new Error('sell refused');ST.sold++;ST.soldBtn+=p;n++;}}
+const THIN=+(process.env.THIN||13);  // THIN=8: the bot sells cards down to that size (thin-deck strategy)
+function sellJunk(run,maxSell,mul){let n=0;if(process.env.THIN)maxSell=Math.max(maxSell,12);
+ for(const id of WEAK.concat(process.env.THIN?['s4','d4','c3','c7','h3','h6','s5','d5','c5']:[])){while(n<maxSell&&run.deck.length>Math.max(E.MIN_DECK,id==='dust'?0:THIN)){const x=run.deck.find(c=>c.d===id&&!c.up&&!c.dd);if(!x)break;const p=E.sellCard(run,x.u,mul);if(p<0)throw new Error('sell refused');ST.sold++;ST.soldBtn+=p;n++;}}
  return n;}
 function playRun(seed,troupe){const o={troupe,lv:LV};if(LOCKED){o.lockC=[];o.lockR=[];for(const u of E.UNLOCKS){if(u.kind==='cards')o.lockC.push(...u.ids);if(u.kind==='relics')o.lockR.push(...u.ids);}}
  if(process.env.HACHA)o.hacha=1;
  const run=E.newRun(seed,o),seenEv=[];
+ if(process.env.LEGACY)run.deck.splice(+process.env.LEGACY);  // LEGACY=8: a save from before the 10-card floor
  for(const r of (process.env.RELICS||'').split(',').filter(Boolean))if(!run.tr.includes(r))run.tr.push(r);
  if(process.env.ALLGAMES)for(const r of E.GAME_KEYS)if(!run.tr.includes(r))run.tr.push(r);
  for(;;){const av=E.availableNodes(run);if(!av.length)return{res:'stuck',run};
@@ -107,7 +110,7 @@ function playRun(seed,troupe){const o={troupe,lv:LV};if(LOCKED){o.lockC=[];o.loc
    if(run.btn>b0&&!ch.pickSell2)ST.eventBtn+=run.btn-b0;}
   else if(n.t==='treasure'){const t=E.randTrinket(run);if(t)run.tr.push(t);else run.btn+=30;}
   if(run.hp<=0||run.hp>run.maxHp)throw new Error('run hp out of range '+run.hp);
-  if(run.deck.length<E.MIN_DECK&&run.deck.length<12)throw new Error('deck below minimum '+run.deck.length);}}
+  if(run.deck.length<E.MIN_DECK&&run.deck.length<12&&!process.env.LEGACY)throw new Error('deck below minimum '+run.deck.length);}}
 // text helpers must not throw for any card / doodle / upgrade, nor any enemy intent
 for(const id in E.CARDS){for(const dd of['',...Object.keys(E.DOODLES)]){const c=E.cdata({d:id,up:0,dd});E.label(c);E.fxLines(c,0);E.fxLines(c,2);if(!E.desc(c)&&id!=='dust')throw new Error('empty desc '+id);E.label(E.cdata({d:id,up:1,dd}));}}
 for(const id in E.ENEMIES){const en={am:1,str:0,bag:[]};for(const st of E.ENEMIES[id].pat)for(const x of st){if(!E.actLabel(x,en)||!E.actDesc(x,en))throw new Error('missing intent text '+id+' '+x.a);}}
@@ -124,6 +127,8 @@ const srt=a=>a.slice().sort((x,y)=>x-y),q=(a,p)=>a[Math.min(a.length-1,Math.floo
 const bs=srt(ST.runBest),ms=srt(ST.mem);
 console.log(`level ${LV}  troupe ${TR}${LOCKED?'  (locked pool)':''}`);
 console.log(`runs ${N}  wins ${wins} (${(wins/N*100).toFixed(1)}%)  errors ${errors}  timeouts ${ST.timeouts}  stalls ${ST.stalls}`);
+if(ST.spares)console.log(`spare cards added per run: ${(ST.spares/N).toFixed(2)}`);
+console.log(`turns with every card stuck in an unfinished tower: ${((ST.locked||0)/N).toFixed(2)} per run`);
 console.log(`reach ch2 ${(ST.chReach[2]/N*100).toFixed(0)}%  ch3 ${(ST.chReach[3]/N*100).toFixed(0)}%`);
 console.log('deaths by enemy',JSON.stringify(deaths));
 console.log('deaths by ch-floor',JSON.stringify(Object.fromEntries(Object.entries(where).sort())));
