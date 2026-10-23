@@ -556,6 +556,21 @@ def main():
     elif a.cmd == 'check':
         games = load_games()
         errs, warns = run_checks(games)
+        # build し忘れ(ゲームのページを作り直したあと、共有画像のURLが相対のまま、など)
+        cfg = load_cfg()
+        base = cfg.get('base_url', '')
+        base = base.rstrip('/') + '/' if base else ''
+        for g in games:
+            page = g['_dir'] / 'index.html'
+            if not page.exists():
+                continue
+            og = g.get('og_image', 'og.png')
+            want = f'{base}{g["id"]}/{og}' if base else og
+            m = re.search(r'<meta property="og:image" content="([^"]*)"', page.read_text('utf-8'))
+            if m and m.group(1) != want:
+                msg = f'{g["id"]}: 共有画像のURLが shelf.json の公開URLと合っていません(build を実行してください)'
+                print('  ! ' + msg)
+                warns.append(msg)
         print(f'ゲーム {len(games)} 本: 直すところ {len(errs)} 件、気になるところ {len(warns)} 件')
         sys.exit(1 if errs else 0)
     elif a.cmd == 'images':

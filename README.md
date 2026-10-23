@@ -30,13 +30,15 @@
 | `satsujo/` | 札上の楼閣。ゲームはすべて `<ID>/` の形で1本1フォルダ |
 | `<ID>/game.json` | そのゲームの紹介文・色・版など。トップページの箱はここから作られる |
 | `tools/shelf.py` | トップページやオフライン用ファイルを作り直す道具 |
+| `tools/check_site.py` | 公開前の通し確認(トップページ→各ゲーム→戻る、エラー、オフライン、スクリーンショット) |
 | `tools/templates/` | トップページ・共有画像・新しいゲームのひな形 |
 | `_headers` | Cloudflare Pages 用のHTTPヘッダー(GitHub Pages では無視される) |
 | `.nojekyll` | GitHub Pages でそのまま配信するための空ファイル |
+| `CLAUDE.md` | Claude がこのリポジトリで作業するときに読む決まりごと |
 
 ## ゲームの足し方
 
-道具は Python 3 だけで動きます(アイコンの描き出しだけ Playwright を使います)。
+道具は Python 3 だけで動きます(アイコンの描き出しと通し確認だけ Playwright を使います)。
 
 1. 下書きを作る: `python3 tools/shelf.py new <ID> <タイトル>`
    - `<ID>/` に、決まりごとを済ませたひな形の `index.html`、`game.json`(status は `draft`)、仮のアイコンができます
@@ -45,9 +47,8 @@
 3. `<ID>/game.json` に紹介文、ジャンル、遊ぶ時間、色を書く
 4. `<ID>/icon.svg` と、1200×630 の `<ID>/og.png` を用意する。og.png は共有画像と、トップページの箱の表紙を兼ねます。`python3 tools/shelf.py images <ID>` でアイコンのPNGができます
 5. 並べてよくなったら `game.json` の `status` を `public` にして `python3 tools/shelf.py build`
-6. コミットして push すると公開されます
-
-`python3 tools/shelf.py check` で、決まりごとを守れているか確かめられます。
+6. `python3 tools/shelf.py check` で決まりごとを、`python3 tools/check_site.py --shots <フォルダ>` で実際の動きを確かめる
+7. コミットして push すると公開されます
 
 ### 決まりごと
 
