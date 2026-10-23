@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>{{title}}</title>
+<meta name="description" content="">
+<meta name="theme-color" content="{{theme}}">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="">
+<meta property="og:image" content="og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{title}}">
+<meta name="twitter:description" content="">
+<meta name="twitter:image" content="og.png">
+<style>
+:root{color-scheme:light dark;--bg:#f4f6fb;--ink:#1d2230;--ink-2:#566074}
+@media (prefers-color-scheme:dark){:root{--bg:#161a24;--ink:#e8ebf2;--ink-2:#a9b1c2}}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
+main{min-height:100vh;min-height:100svh;display:grid;place-items:center;text-align:center;padding:24px}
+.sub{color:var(--ink-2)}
+</style>
+</head>
+<body>
+<main id="app">
+  <div>
+    <h1>{{title}}</h1>
+    <p class="sub">ここにゲームを作ります。</p>
+    <p><a id="shelf-link" href="../" hidden>ほかのゲーム</a></p>
+  </div>
+</main>
+<script>
+// ===== 置き場の決まりごと(README の「ゲームの足し方」を参照) =====
+const GAME_ID='{{id}}';  // フォルダ名と同じ。保存キーは必ず GAME_ID+'-' で始める(同じドメインのほかのゲームとぶつけない)
+const store={
+  get(k){try{return JSON.parse(localStorage.getItem(GAME_ID+'-'+k));}catch(e){return null;}},
+  set(k,v){try{localStorage.setItem(GAME_ID+'-'+k,JSON.stringify(v));}catch(e){}},
+  del(k){try{localStorage.removeItem(GAME_ID+'-'+k);}catch(e){}}
+};
+// トップページの箱の下に出る「最後に遊んだ日・一言・続きの有無」。遊び始めたときや記録が変わったときに呼ぶ
+function shelfMark(note,resume){try{localStorage.setItem('shelf:'+GAME_ID,JSON.stringify({t:Date.now(),note:note||'',resume:!!resume}));}catch(e){}}
+// トップページへ戻るリンク。ホーム画面から開いたとき(アプリとして起動)は出さない
+if(!matchMedia('(display-mode: standalone)').matches&&!navigator.standalone)document.getElementById('shelf-link').hidden=false;
+</script>
+<script>
+if('serviceWorker' in navigator&&location.protocol==='https:'){addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+</script>
+</body>
+</html>

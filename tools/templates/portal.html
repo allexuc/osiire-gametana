@@ -1,0 +1,180 @@
+<!doctype html>
+{{generated}}
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>{{name}}</title>
+<meta name="description" content="{{description}}">
+<meta name="theme-color" content="#e2e8ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a202d" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{name}}">
+<meta property="og:title" content="{{name}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:image" content="{{og_image}}">
+{{og_url}}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{name}}">
+<meta name="twitter:description" content="{{description}}">
+<meta name="twitter:image" content="{{og_image}}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap">
+<style>
+/* 押し入れ: ふすま(唐紙の七宝柄)の一部が開いて、杉板の棚にゲームの箱が並ぶ */
+:root{
+  color-scheme:light dark;
+  --sans:"Zen Kaku Gothic New",system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;
+  --hand:"Klee One","Zen Kaku Gothic New",serif;
+  --obi-w:44px;
+  --fusuma:#e2e8ee;--f-ink:#1e2631;--f-ink-2:#465264;
+  --shippo:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cg fill='none' stroke='%23f6f9fc' stroke-width='1.6'%3E%3Ccircle cx='0' cy='0' r='28'/%3E%3Ccircle cx='56' cy='0' r='28'/%3E%3Ccircle cx='0' cy='56' r='28'/%3E%3Ccircle cx='56' cy='56' r='28'/%3E%3Ccircle cx='28' cy='28' r='28'/%3E%3C/g%3E%3C/svg%3E");
+  --cedar:#d5ae86;--grain-d:rgba(110,62,24,.075);--grain-l:rgba(255,244,228,.13);
+  --board-top:#b4844f;--board-edge:#7c5331;--rail:#3b2a1c;--post:#57402b;--groove:#6d5039;
+  --ink:#2a1e14;--ink-2:#4f3d2d;
+  --accent:#2c54c8;--accent-deep:#1c378c;--accent-ink:#ffffff;--focus:#1f45b8;
+  --empty-line:rgba(79,61,45,.5);--empty-bg:rgba(90,55,25,.07);
+  --hk-rim:#2a1d13;--hk-brass:#c9a24f;--hk-well:#4b3522;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --fusuma:#1a202d;--f-ink:#ebe6dc;--f-ink-2:#b9b3a8;
+  --shippo:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cg fill='none' stroke='%23263149' stroke-width='1.6'%3E%3Ccircle cx='0' cy='0' r='28'/%3E%3Ccircle cx='56' cy='0' r='28'/%3E%3Ccircle cx='0' cy='56' r='28'/%3E%3Ccircle cx='56' cy='56' r='28'/%3E%3Ccircle cx='28' cy='28' r='28'/%3E%3C/g%3E%3C/svg%3E");
+  --cedar:#3b2e23;--grain-d:rgba(0,0,0,.16);--grain-l:rgba(255,230,200,.035);
+  --board-top:#6e5139;--board-edge:#4a3524;--rail:#120d09;--post:#231910;--groove:#3b2c1f;
+  --ink:#f1e9dd;--ink-2:#d0c2b0;
+  --accent:#4d6de2;--accent-deep:#2c449e;--accent-ink:#ffffff;--focus:#ffcf66;
+  --empty-line:rgba(208,194,176,.45);--empty-bg:rgba(0,0,0,.16);
+  --hk-rim:#0d0906;--hk-brass:#b38b43;--hk-well:#2a1f15;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --fusuma:#1a202d;--f-ink:#ebe6dc;--f-ink-2:#b9b3a8;
+  --shippo:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cg fill='none' stroke='%23263149' stroke-width='1.6'%3E%3Ccircle cx='0' cy='0' r='28'/%3E%3Ccircle cx='56' cy='0' r='28'/%3E%3Ccircle cx='0' cy='56' r='28'/%3E%3Ccircle cx='56' cy='56' r='28'/%3E%3Ccircle cx='28' cy='28' r='28'/%3E%3C/g%3E%3C/svg%3E");
+  --cedar:#3b2e23;--grain-d:rgba(0,0,0,.16);--grain-l:rgba(255,230,200,.035);
+  --board-top:#6e5139;--board-edge:#4a3524;--rail:#120d09;--post:#231910;--groove:#3b2c1f;
+  --ink:#f1e9dd;--ink-2:#d0c2b0;
+  --accent:#4d6de2;--accent-deep:#2c449e;--accent-ink:#ffffff;--focus:#ffcf66;
+  --empty-line:rgba(208,194,176,.45);--empty-bg:rgba(0,0,0,.16);
+  --hk-rim:#0d0906;--hk-brass:#b38b43;--hk-well:#2a1f15;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;min-height:100vh;background-color:var(--fusuma);background-image:var(--shippo);background-size:56px 56px;color:var(--f-ink);font:500 16px/1.8 var(--sans);line-break:strict}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+
+/* 見出しまわり: 引手(ふすまの取っ手)と名前を1行に、紹介文はその下 */
+.head{max-width:1040px;margin:0 auto;padding:44px 24px 30px;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:4px 18px}
+.hikite{width:58px;height:58px}
+.hikite .rim{fill:var(--hk-rim)}.hikite .brass{fill:var(--hk-brass)}.hikite .well{fill:var(--hk-well)}
+.hikite .shine{fill:none;stroke:rgba(255,255,255,.32);stroke-width:2.4;stroke-linecap:round}
+.head h1{margin:0;font:600 clamp(30px,7.4vw,48px)/1.25 var(--hand);letter-spacing:.06em}
+.lead{grid-column:2;margin:0;color:var(--f-ink-2);max-width:34em}
+.head h1,.lead,.catch,.empty{word-break:auto-phrase}
+
+.closet{position:relative;max-width:1040px;margin:0 auto;padding:32px 18px 50px;color:var(--ink);overflow:hidden;
+  background-color:var(--cedar);
+  background-image:linear-gradient(to bottom,rgba(20,10,4,.36),rgba(20,10,4,0) 36px),
+    repeating-linear-gradient(90deg,var(--grain-d) 0 2px,transparent 2px 37px),
+    repeating-linear-gradient(90deg,var(--grain-d) 0 1px,transparent 1px 23px),
+    repeating-linear-gradient(90deg,var(--grain-l) 0 11px,transparent 11px 71px);
+  border:solid var(--post);border-width:18px 12px 0;border-top-color:var(--rail)}
+.closet::after{content:"";position:absolute;left:0;right:0;bottom:0;height:14px;
+  background:linear-gradient(to bottom,var(--rail) 0 3px,var(--groove) 3px 5px,var(--rail) 5px 8px,var(--groove) 8px 10px,var(--rail) 10px)}
+
+.shelf{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:minmax(0,1fr);gap:52px 40px}
+@media (min-width:760px){.shelf{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.game{min-width:0}
+.box{position:relative;display:flex;container-type:inline-size}
+/* 棚板: 同じ段の箱の下で左右の壁までつながるように、横に長く伸ばして押し入れの枠で切る */
+.box::after{content:"";position:absolute;z-index:0;left:-100vw;right:-100vw;top:100%;height:18px;
+  background:linear-gradient(to bottom,var(--board-top) 0 6px,var(--board-edge) 6px);box-shadow:0 10px 14px -8px rgba(30,15,5,.55)}
+.box>*{position:relative;z-index:1;transition:transform .18s ease}
+.obi{flex:0 0 var(--obi-w);margin:0;writing-mode:vertical-rl;display:flex;align-items:center;justify-content:flex-start;padding:14px 0;
+  background:var(--obi);color:var(--obi-ink);font-family:var(--hand);font-weight:600;line-height:1;letter-spacing:.04em;
+  font-size:20px;font-size:clamp(14px,calc(((100cqw - var(--obi-w)) * .525 - 30px) / var(--n) / 1.06),26px);
+  box-shadow:inset -1px 0 0 rgba(255,255,255,.2),inset 3px 0 0 rgba(0,0,0,.14)}
+.obi rt{font-size:.44em;letter-spacing:0}
+.cover{flex:1 1 auto;min-width:0;display:block;background:var(--board-edge);box-shadow:5px 0 0 -1px rgba(0,0,0,.16),12px 4px 18px -8px rgba(25,12,4,.6)}
+.cover img{display:block;width:100%;height:auto;aspect-ratio:1200/630;object-fit:cover}
+@media (hover:hover){.game:hover .box>*{transform:translateY(-6px)}}
+.game:focus-within .box>*{transform:translateY(-6px)}
+
+.tag{padding-top:36px;max-width:36em}
+.catch{margin:0;font:600 21px/1.55 var(--hand);letter-spacing:.02em;text-wrap:balance}
+.desc{margin:8px 0 0}
+.spec{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 16px;margin:14px 0 0;font-size:14px;line-height:1.7}
+.spec div{display:contents}
+.spec dt{color:var(--ink-2)}
+.spec dd{margin:0;font-weight:700}
+.go{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-top:22px}
+.play{display:inline-flex;align-items:center;justify-content:center;min-width:9em;min-height:50px;padding:0 28px 0 calc(28px + .24em);border-radius:5px;
+  background:var(--accent);color:var(--accent-ink);font:700 18px/1 var(--sans);letter-spacing:.24em;text-decoration:none;box-shadow:0 4px 0 var(--accent-deep);transition:transform .08s,box-shadow .08s}
+.play:hover{filter:brightness(1.07)}
+.play:active{transform:translateY(3px);box-shadow:0 1px 0 var(--accent-deep)}
+.rec{margin:0;display:flex;flex-wrap:wrap;gap:0 12px;font-size:14px;line-height:1.6;color:var(--ink-2)}
+.rec .resume{color:var(--ink);font-weight:700}
+
+.next .box{align-items:stretch}
+.empty{flex:1 1 auto;margin:0;display:grid;place-items:center;padding:16px;text-align:center;
+  min-height:150px;height:calc((100cqw - 44px) * .525);
+  border:2px dashed var(--empty-line);background:var(--empty-bg);color:var(--ink-2);font:600 18px/1.6 var(--hand)}
+
+.foot{max-width:1040px;margin:0 auto;padding:30px 24px 52px;color:var(--f-ink-2);font-size:14px}
+.foot p{margin:0 0 6px;max-width:46em}
+
+@media (max-width:520px){
+  .head{padding:30px 16px 22px;gap:8px 12px}
+  .hikite{width:42px;height:42px}
+  .lead{grid-column:1 / -1}
+  .closet{margin:0 8px;border-width:14px 8px 0;padding:26px 12px 44px}
+  .foot{padding:26px 16px 44px}
+}
+@media (prefers-reduced-motion:reduce){.box>*,.play{transition:none}.game .box>*{transform:none}}
+</style>
+</head>
+<body>
+<header class="head">
+  <svg class="hikite" viewBox="0 0 64 64" aria-hidden="true"><circle class="rim" cx="32" cy="32" r="31"/><circle class="brass" cx="32" cy="32" r="24"/><circle class="well" cx="32" cy="32" r="17"/><path class="shine" d="M18.5 27a14 14 0 0 1 11-11"/></svg>
+  <h1>{{name}}</h1>
+  <p class="lead">{{tagline}}</p>
+</header>
+<main class="closet">
+  <ul class="shelf" role="list">
+{{games}}
+{{next}}
+  </ul>
+</main>
+<footer class="foot">
+  <p>遊んだ記録は、そのゲームを遊んだブラウザの中に保存されます。別の端末やブラウザには引き継がれません。</p>
+  <p>気に入ったゲームはホーム画面に追加すると、アプリのように開けます。一度開いたあとはオフラインでも遊べます。</p>
+  {{repo}}
+</footer>
+<script>
+// 各ゲームが localStorage の shelf:<ID> に書いた「最後に遊んだ時刻・一言・続きの有無」を箱の下に出す
+(()=>{const today=new Date();today.setHours(0,0,0,0);
+for(const el of document.querySelectorAll('[data-rec]')){
+  let r=null;try{r=JSON.parse(localStorage.getItem('shelf:'+el.dataset.rec));}catch(e){}
+  if(!r||typeof r.t!=='number')continue;
+  const d=new Date(r.t),d0=new Date(r.t);d0.setHours(0,0,0,0);
+  const n=Math.round((today-d0)/864e5);
+  const when=n<=0?'きょう遊んだ':n===1?'きのう遊んだ':n<30?n+'日前に遊んだ':(d.getMonth()+1)+'月'+d.getDate()+'日に遊んだ';
+  const add=(cls,txt)=>{const s=document.createElement('span');s.className=cls;s.textContent=txt;el.append(s);};
+  add('when',when);
+  if(r.note)add('note',String(r.note).slice(0,40));
+  if(r.resume)add('resume','続きから遊べます');
+  el.hidden=false;
+}
+// ファイルを直接開いたとき(file://)はフォルダを開いても index.html が出ないので、リンクに付け足す
+if(location.protocol==='file:')for(const a of document.querySelectorAll('a[href$="/"]'))if(!/^[a-z]+:/i.test(a.getAttribute('href')))a.setAttribute('href',a.getAttribute('href')+'index.html');
+})();
+</script>
+</body>
+</html>

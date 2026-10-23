@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap">
+<style>
+html,body{margin:0}
+body{width:1200px;height:630px;overflow:hidden;box-sizing:border-box;display:flex;align-items:center;gap:56px;padding:0 56px 0 76px;
+  background-color:#e2e8ee;background-size:56px 56px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cg fill='none' stroke='%23f6f9fc' stroke-width='1.6'%3E%3Ccircle cx='0' cy='0' r='28'/%3E%3Ccircle cx='56' cy='0' r='28'/%3E%3Ccircle cx='0' cy='56' r='28'/%3E%3Ccircle cx='56' cy='56' r='28'/%3E%3Ccircle cx='28' cy='28' r='28'/%3E%3C/g%3E%3C/svg%3E");
+  font-family:"Zen Kaku Gothic New",sans-serif;color:#1e2631;line-break:strict;word-break:auto-phrase}
+.txt{flex:1;display:flex;flex-direction:column;gap:22px}
+svg{width:92px;height:92px}
+h1{margin:0;font:600 {{name_size}}px/1.12 "Klee One",serif;letter-spacing:.06em}
+p{margin:0;font-size:27px;font-weight:700;line-height:1.6;color:#465264}
+.closet{flex:0 0 auto;width:500px;padding:26px 24px 40px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:46px;
+  background-color:#d5ae86;
+  background-image:linear-gradient(to bottom,rgba(20,10,4,.36),rgba(20,10,4,0) 36px),repeating-linear-gradient(90deg,rgba(110,62,24,.075) 0 2px,transparent 2px 37px),repeating-linear-gradient(90deg,rgba(110,62,24,.075) 0 1px,transparent 1px 23px),repeating-linear-gradient(90deg,rgba(255,244,228,.13) 0 11px,transparent 11px 71px);
+  border:solid #57402b;border-width:18px 12px 0;border-top-color:#3b2a1c}
+.closet::after{content:"";position:absolute;left:0;right:0;bottom:0;height:14px;background:linear-gradient(to bottom,#3b2a1c 0 3px,#6d5039 3px 5px,#3b2a1c 5px 8px,#6d5039 8px 10px,#3b2a1c 10px)}
+.box{position:relative;display:flex;height:200px}
+.box::after{content:"";position:absolute;left:-60px;right:-60px;top:100%;height:18px;background:linear-gradient(to bottom,#b4844f 0 6px,#7c5331 6px);box-shadow:0 10px 14px -8px rgba(30,15,5,.55)}
+.obi{flex:0 0 44px;writing-mode:vertical-rl;display:flex;align-items:center;padding:14px 0;background:var(--obi);color:var(--obi-ink);font:600 26px/1 "Klee One",serif;letter-spacing:.04em;position:relative;z-index:1}
+.box img{flex:1;min-width:0;height:100%;object-fit:cover;position:relative;z-index:1;box-shadow:12px 4px 18px -8px rgba(25,12,4,.6)}
+.box.empty span{flex:1;display:grid;place-items:center;border:2px dashed rgba(79,61,45,.5);background:rgba(90,55,25,.07);position:relative;z-index:1;font:600 26px/1.5 "Klee One",serif;color:#4f3d2d}
+</style></head>
+<body>
+<div class="txt">
+  <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="31" fill="#2a1d13"/><circle cx="32" cy="32" r="24" fill="#c9a24f"/><circle cx="32" cy="32" r="17" fill="#4b3522"/><path d="M18.5 27a14 14 0 0 1 11-11" fill="none" stroke="rgba(255,255,255,.32)" stroke-width="2.4" stroke-linecap="round"/></svg>
+  <h1>{{name_html}}</h1>
+  <p>{{tagline}}</p>
+</div>
+<div class="closet">{{boxes}}</div>
+</body></html>

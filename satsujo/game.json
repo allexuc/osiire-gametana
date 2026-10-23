@@ -1,0 +1,20 @@
+{
+  "id": "satsujo",
+  "title": "札上の楼閣",
+  "kana": "さつじょうのろうかく",
+  "catch": "積めば強い。崩せば、もっと強い。",
+  "description": "トランプで楼閣を積み、崩れ落ちる札まで武器にして戦うデッキ構築ローグライク。子供部屋から台所、居間へ。全3章を抜けて、家じゅうの災難を乗り越えよう。",
+  "genre": "デッキ構築ローグライク",
+  "playtime": "30分前後（途中で中断できます）",
+  "controls": "タップだけ",
+  "status": "public",
+  "version": "1.0.1",
+  "added": "2026-10-23",
+  "order": 1,
+  "theme_color": "#2c54c8",
+  "background_color": "#e6ecf7",
+  "orientation": "portrait",
+  "og_image": "og.png",
+  "cover": "og.png",
+  "offline": true
+}

@@ -1,19 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <title>札上の楼閣</title>
-  <rect width="512" height="512" rx="112" fill="#2c54c8"/>
-  <g stroke="#d7d0bf" stroke-width="5">
-    <rect x="70" y="318" width="104" height="134" rx="14" fill="#fffdf6"/>
-    <rect x="204" y="318" width="104" height="134" rx="14" fill="#fffdf6"/>
-    <rect x="338" y="318" width="104" height="134" rx="14" fill="#fffdf6"/>
-    <rect x="137" y="176" width="104" height="134" rx="14" fill="#fffdf6"/>
-    <rect x="271" y="176" width="104" height="134" rx="14" fill="#fffdf6" transform="rotate(7 323 243)"/>
+  <defs>
+    <pattern id="shippo" width="64" height="64" patternUnits="userSpaceOnUse" x="-8" y="-8">
+      <g fill="none" stroke="#f4f7fb" stroke-width="4">
+        <circle cx="0" cy="0" r="32"/><circle cx="64" cy="0" r="32"/><circle cx="0" cy="64" r="32"/><circle cx="64" cy="64" r="32"/><circle cx="32" cy="32" r="32"/>
+      </g>
+    </pattern>
+    <clipPath id="round"><rect width="512" height="512" rx="112"/></clipPath>
+  </defs>
+  <g clip-path="url(#round)">
+    <rect width="512" height="512" fill="#d3a97d"/>
+    <rect x="296" y="0" width="216" height="58" fill="#3b2a1c"/>
+    <rect x="296" y="58" width="216" height="28" fill="#3b2a1c" opacity=".25"/>
+    <rect x="296" y="362" width="216" height="150" fill="#a9784c"/>
+    <rect x="338" y="214" width="156" height="128" fill="#f4f6fb"/>
+    <rect x="338" y="214" width="40" height="128" fill="#2c54c8"/>
+    <rect x="296" y="340" width="216" height="12" fill="#b4844f"/>
+    <rect x="296" y="352" width="216" height="24" fill="#7c5331"/>
+    <rect width="300" height="512" fill="#d1dbe7"/>
+    <rect width="300" height="512" fill="url(#shippo)"/>
+    <rect x="288" y="0" width="22" height="512" fill="#2a1d13"/>
+    <circle cx="236" cy="266" r="44" fill="#2a1d13"/>
+    <circle cx="236" cy="266" r="33" fill="#c9a24f"/>
+    <circle cx="236" cy="266" r="21" fill="#4b3522"/>
   </g>
-  <rect x="204" y="34" width="104" height="134" rx="14" fill="#fffdf6" stroke="#f0b23a" stroke-width="10"/>
-  <g font-family="'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif" font-weight="700" text-anchor="middle">
-    <text x="256" y="128" font-size="70" fill="#1a1c23">♠</text>
-    <text x="122" y="404" font-size="54" fill="#c22f29">♥</text>
-    <text x="256" y="404" font-size="54" fill="#1a1c23">♣</text>
-    <text x="390" y="404" font-size="54" fill="#c22f29">♦</text>
-  </g>
-  <line x1="56" y1="468" x2="456" y2="468" stroke="#fffdf6" stroke-opacity=".55" stroke-width="8" stroke-linecap="round"/>
 </svg>

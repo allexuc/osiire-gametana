@@ -4,7 +4,7 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 /
   Cache-Control: no-cache
-/index.html
+/:game/
   Cache-Control: no-cache
-/sw.js
+/:game/sw.js
   Cache-Control: no-cache
