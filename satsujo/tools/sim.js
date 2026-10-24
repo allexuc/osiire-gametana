@@ -1,6 +1,6 @@
 // Headless check v3 for 札上の楼閣 (完全版): syntax, engine invariants over 3 chapters, troupes, levels, selling, and balance with a greedy bot.
 // usage: node tools/sim.js index.html [runs] [level] [troupe|all] [locked]
-// env: HACHA=1 (ハチャメチャ箱), RELICS=poker,tarot (最初から持たせるガラクタ), ALLGAMES=1 (遊び道具を全部), TB=1 (一座ごとのボス戦), TRICKS=1 (役の回数), THIN=10 (デッキを10枚まで売って薄くする), LEGACY=8 (10枚未満の古いセーブで始める)
+// env: HACHA=1 (ハチャメチャ箱), RELICS=poker,tarot (最初から持たせるガラクタ), ALLGAMES=1 (遊び道具を全部), TB=1 (一座ごとのボス戦), TRICKS=1 (役の回数), THIN=10 (デッキを10枚まで売って薄くする), LEGACY=8 (10枚未満の古いセーブで始める), ADD=jc,jg (札を足して始める), SPROUT=1 (芽の落書きを付けて始める), LOCKR=asagao / LOCKC=jc (出さないガラクタや札)
 const fs=require('fs'),vm=require('vm');
 const src=fs.readFileSync(process.argv[2],'utf8'),N=+(process.argv[3]||400),LV=+(process.argv[4]||0),TR=process.argv[5]||'all',LOCKED=process.argv[6]==='locked';
 const js=src.split('<script>').map(s=>s.split('</script>')[0]).find(s=>s.includes('==ENGINE START=='));
@@ -20,7 +20,7 @@ function check(run){const b=run.b;if(!b)return;
  const all=[...b.hand,...b.draw,...b.disc,...b.tower.filter(Boolean).map(x=>x.i),...b.en.bag],real=all.filter(x=>!x.tmp);
  if(real.length!==run.deck.length)throw new Error(`card count ${real.length} != deck ${run.deck.length}`);
  if(new Set(all.map(x=>x.u)).size!==all.length)throw new Error('duplicate uid');
- for(const v of[b.hp,b.grd,b.brc,b.act,b.en.hp,b.en.blk,b.en.str,b.weak,b.chill])if(!Number.isFinite(v)||v<0)throw new Error('bad number '+v);
+ for(const v of[b.hp,b.grd,b.brc,b.act,b.en.hp,b.en.blk,b.en.str,b.weak,b.chill,b.cho||0])if(!Number.isFinite(v)||v<0)throw new Error('bad number '+v);
  if(b.hp>b.maxHp)throw new Error('hp over max');if(b.en.hp>b.en.max)throw new Error('enemy hp over max');if(b.hand.length>10)throw new Error('hand over 10');}
 const TRICK_SC=n=>n==='21!'?20:n==='革命'||n==='革命返し'?6:n==='七並べ'?6:n==='ペア'?4:['猪鹿蝶','月見で一杯','花見で一杯','三光','赤短','青短'].includes(n)?12:0;
 function score(run,c,k,m,inc,hi){const b=run.b,F=c.fx,t=E.tierOf(k),tc=E.towerCount(b)+1,r=c.kw.twice?2:1;let s=0;if(hi!=null&&!process.env.NAIVE)s+=TRICK_SC(E.trickPreview(run,hi,k));
@@ -30,7 +30,7 @@ function score(run,c,k,m,inc,hi){const b=run.b,F=c.fx,t=E.tierOf(k),tc=E.towerCo
  if(F.heal)s+=Math.min(F.heal*m*r,b.maxHp-b.hp)*0.6;if(F.healT)s+=Math.min(F.healT*tc*m,b.maxHp-b.hp)*0.6;
  if(F.weak){const e=b.en,pat=E.ENEMIES[b.eid].pat[e.step];let hits=0;for(const x of pat)if(x.a==='atk')hits+=x.n;s+=Math.min(F.weak*m*hits,needG)*0.9;}
  if(F.lull&&!b.lull)s+=needG*0.45;
- if(F.draw)s+=F.draw*2;if(F.act)s+=F.act*3;
+ if(F.draw)s+=F.draw*2;if(F.act)s+=F.act*3;if(F.cho)s+=F.cho*Math.max(1,6-b.turn)*2.2;
  if(c.kw.aura)s+=3;if(c.kw.cheer)s+=2*c.kw.cheer;if(c.kw.clone)s+=4;if(c.kw.bomb)s+=3;if(c.kw.spring)s+=1;if(c.kw.chain)s+=2;
  if(c.kw.echo&&b.last)s+=((b.last.fx.dmg||0)*1.2+(b.last.fx.grd||0)*0.5)*m;
  if(F.mirror&&t>0){for(const q of E.sups(k)){const X=b.tower[q];if(X)s+=((X.c.fx.dmg||0)*1.2+(X.c.fx.grd||0)*0.4+(X.c.fx.brc||0)*2)*m;}}
@@ -47,7 +47,7 @@ function estDemo(run,k){const b=run.b,T=b.tower.slice(),q=[k],boom=E.boomVal(run
    if(X.c.kw.chain)for(const nb of E.rowAll(s))if(T[nb]&&!T[nb].c.kw.steady)q.push(nb);}
   let more=false;for(let m=4;m<10;m++){const Y=T[m];if(!Y||Y.c.kw.float)continue;const[p,r]=E.sups(m);if(!T[p]||!T[r]){q.push(m);more=true;}}if(!more)break;}
  return{dmg,n,bombs};}
-function countFx(fx){for(const f of fx){if(f.t==='trick'){ST.tricks=ST.tricks||{};ST.tricks[f.n]=(ST.tricks[f.n]||0)+1;}if(f.t==='boom')ST.booms++;if(f.t==='flip')ST.flips++;if(f.t==='crown')ST.crowns++;if(f.t==='det')ST.dets++;if(f.t==='swap')ST.swaps++;}}
+function countFx(fx){for(const f of fx){if(f.t==='cho')ST.cho=(ST.cho||0)+f.v;if(f.t==='grow')ST.grow=(ST.grow||0)+1;if(f.t==='beetle')ST.beetle=(ST.beetle||0)+f.v;if(f.t==='trick'){ST.tricks=ST.tricks||{};ST.tricks[f.n]=(ST.tricks[f.n]||0)+1;}if(f.t==='boom')ST.booms++;if(f.t==='flip')ST.flips++;if(f.t==='crown')ST.crowns++;if(f.t==='det')ST.dets++;if(f.t==='swap')ST.swaps++;}}
 function placeLoop(run,lim){const b=run.b;let n=0;
  while(n++<lim&&!b.over){const inc=E.incoming(run);let best=null;
   for(let hi=0;hi<b.hand.length;hi++)for(let k=0;k<10;k++){const ck=E.canPlace(run,hi,k);if(!ck.ok)continue;const sc=score(run,E.cdata(b.hand[hi]),k,ck.m,inc,hi);if(!best||sc>best.sc)best={hi,k,sc};}
@@ -64,7 +64,7 @@ function aiTurn(run){const b=run.b;placeLoop(run,25);
  if(!b.over&&!b.wedge&&b.hand.length){const inc=E.incoming(run);if(inc.knocks>b.brc&&E.towerCount(b)>=2){E.wedgeCard(run,0);check(run);}}}
 const S=k=>ST.en[k]||(ST.en[k]={n:0,win:0,turns:0,loss:0});
 function fight(run,eid,f){E.startBattle(run,eid,f);if(run.b.spare)ST.spares=(ST.spares||0)+run.b.spare;const hp0=run.hp;let turns=0;const tb=E.ENEMIES[eid].tier==='boss'?(ST.tb[run.troupe+':'+eid]||(ST.tb[run.troupe+':'+eid]={n:0,win:0,hp:0})):null;if(tb){tb.n++;tb.hp+=run.hp;}
- while(!run.b.over&&turns<60){turns++;E.startTurn(run);check(run);aiTurn(run);if(run.b.over)break;const fx=E.endTurn(run);countFx(fx);check(run);E.threats(run);
+ while(!run.b.over&&turns<60){turns++;countFx(E.startTurn(run));check(run);aiTurn(run);if(run.b.over)break;const fx=E.endTurn(run);countFx(fx);check(run);E.threats(run);
   for(const x of E.ENEMIES[eid].pat[run.b.en.step]){if(!E.actLabel(x,run.b.en)||!E.actDesc(x,run.b.en))throw new Error('intent text');}}
  const r=run.b.over||'timeout',s=S(eid);if(tb&&r==='win')tb.win++;if(r==='timeout')ST.timeouts++;s.n++;s.turns+=turns;s.loss+=hp0-run.b.hp;if(r==='win')s.win++;return r;}
 const RARK={r:3,u:2,c:1,st:0,x:-1};
@@ -79,10 +79,14 @@ function sellJunk(run,maxSell,mul){let n=0;if(process.env.THIN)maxSell=Math.max(
  return n;}
 function playRun(seed,troupe){const o={troupe,lv:LV};if(LOCKED){o.lockC=[];o.lockR=[];for(const u of E.UNLOCKS){if(u.kind==='cards')o.lockC.push(...u.ids);if(u.kind==='relics')o.lockR.push(...u.ids);}}
  if(process.env.HACHA)o.hacha=1;
+ if(process.env.LOCKR)o.lockR=(o.lockR||[]).concat(process.env.LOCKR.split(','));  // LOCKR=asagao,...: keep these relics out of the run
+ if(process.env.LOCKC)o.lockC=(o.lockC||[]).concat(process.env.LOCKC.split(','));
  const run=E.newRun(seed,o),seenEv=[];
  if(process.env.LEGACY)run.deck.splice(+process.env.LEGACY);  // LEGACY=8: a save from before the 10-card floor
  for(const r of (process.env.RELICS||'').split(',').filter(Boolean))if(!run.tr.includes(r))run.tr.push(r);
  if(process.env.ALLGAMES)for(const r of E.GAME_KEYS)if(!run.tr.includes(r))run.tr.push(r);
+ for(const d of (process.env.ADD||'').split(',').filter(Boolean))E.addCard(run,d);  // ADD=jc,jg: cards added to the starting deck
+ if(process.env.SPROUT){for(const x of run.deck.filter(E.canDoodle).slice(0,+process.env.SPROUT))x.dd='sprout';}  // SPROUT=3: sprout doodles on starting cards
  for(;;){const av=E.availableNodes(run);if(!av.length)return{res:'stuck',run};
   const[f,i]=chooseNode(run,av),n=run.map.fl[f][i];run.floor=f;run.node=i;n.done=1;
   if(n.t==='battle'||n.t==='elite'||n.t==='boss'){const eid=E.pickEnemy(run,n.t,f),r=fight(run,eid,f);
@@ -102,6 +106,7 @@ function playRun(seed,troupe){const o={troupe,lv:LV};if(LOCKED){o.lockC=[];o.loc
    if(ch.pickUp){const c=run.deck.find(E.canUpgrade);if(c)E.upgradeCard(run,c.u);}
    else if(ch.pickRemove){const c=run.deck.find(x=>x.d==='dust')||run.deck.find(x=>x.d==='s2')||run.deck[0];E.removeCard(run,c.u);}
    else if(ch.pickDoodle){const c=run.deck.find(E.canDoodle);if(c)E.doodleCard(run,c.u,cx.dd);}
+   else if(ch.pickSprout){const c=run.deck.find(x=>E.canDoodle(x)&&E.CARDS[x.d].s==='S')||run.deck.find(E.canDoodle);if(c)E.doodleCard(run,c.u,'sprout');}
    else if(ch.pickMicro){const c=run.deck.find(x=>E.CARDS[x.d].rar!=='x');if(c&&typeof E.microwave(run,c.u)!=='string')throw new Error('micro text');}
    else if(ch.pickDup){const c=run.deck.slice().sort((a,b)=>RARK[E.CARDS[b.d].rar]-RARK[E.CARDS[a.d].rar])[0];if(c)E.dupCard(run,c.u);}
    else if(ch.pickSell2){sellJunk(run,1,2);}
@@ -128,6 +133,7 @@ const bs=srt(ST.runBest),ms=srt(ST.mem);
 console.log(`level ${LV}  troupe ${TR}${LOCKED?'  (locked pool)':''}`);
 console.log(`runs ${N}  wins ${wins} (${(wins/N*100).toFixed(1)}%)  errors ${errors}  timeouts ${ST.timeouts}  stalls ${ST.stalls}`);
 if(ST.spares)console.log(`spare cards added per run: ${(ST.spares/N).toFixed(2)}`);
+if(ST.cho||ST.grow||ST.beetle)console.log(`self-strengthening per run: 調子 gained ${((ST.cho||0)/N).toFixed(1)}  growths ${((ST.grow||0)/N).toFixed(1)}  beetle dmg ${((ST.beetle||0)/N).toFixed(0)}`);
 console.log(`turns with every card stuck in an unfinished tower: ${((ST.locked||0)/N).toFixed(2)} per run`);
 console.log(`reach ch2 ${(ST.chReach[2]/N*100).toFixed(0)}%  ch3 ${(ST.chReach[3]/N*100).toFixed(0)}%`);
 console.log('deaths by enemy',JSON.stringify(deaths));

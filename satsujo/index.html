@@ -248,6 +248,16 @@ button{font:inherit;color:inherit}
 .sub.ver{text-align:center;margin-top:-4px}
 /* 予備の札: 白紙の札。内側に点線の枠 */
 .card.spare::before{content:"";position:absolute;inset:4px;border:1px dashed var(--paper-edge);border-radius:4px;pointer-events:none}
+/* v1.1: 自己強化(調子・育つ札・育つガラクタ) */
+:root{--cho:#b5470f;--dd-sprout:#4f8f12}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--cho:#ffa36b}}
+:root[data-theme="dark"]{--cho:#ffa36b}
+.chip.cho{color:var(--cho);border-color:currentColor}
+.dd-sprout{--ddc:var(--dd-sprout)}
+.float.c{color:var(--cho)}
+.card .dd.dd2{top:calc(var(--w,66px) * .74)}
+.card .dd .ddn{position:absolute;right:-5px;bottom:-5px;min-width:1.3em;box-sizing:border-box;font-style:normal;font-family:var(--f-body);font-weight:700;font-size:calc(var(--w,66px) * .14);line-height:1.35;text-align:center;color:#fff;background:var(--dd-sprout);border-radius:999px;padding:0 2px;transform:rotate(9deg)}
+.chip .trst{color:var(--heal);font-weight:700}
 </style>
 </head>
 <body>
@@ -278,6 +288,7 @@ const CARDS={};
  ['dK','D',13,2,{grd:12,brc:2},0,'r','城壁のキング'],['cK','C',13,1,{brc:2},{steady:1,base:1},'r','礎のキング'],['c10','C',10,1,{brc:1,det:1},0,'r','発破の10'],
  ['hQ','H',12,1,{multiply:1},0,'r','増殖のクイーン'],['hK','H',13,2,{shuffle:1},0,'r','模様替えのキング'],['h10','H',10,1,{heal:2},{cheer:2},'r','拍手の10'],
  ['jk','J',0,1,{},{float:1,echo:1},'r','ジョーカー'],['jf','J',0,1,{flip:1},{float:1},'r','ちゃぶ台返し'],['jm','J',0,1,{swap:1},{float:1},'r','手品師のジョーカー'],
+ ['jc','J',0,0,{cho:1},{float:1},'r','お調子者のジョーカー'],['jg','J',0,1,{dmg:4},{float:1,grow:1},'r','成長期のジョーカー'],
  ['dust','X',0,1,{},{dust:1},'x','ホコリ'],
  ['spare','X',0,1,{grd:2},{spare:1},'x','予備の札'],
 ].forEach(([id,s,r,cost,fx,kw,rar,name])=>{CARDS[id]={id,s,r,cost,fx:fx||{},kw:kw||{},rar,name:name||''};});
@@ -289,9 +300,11 @@ const DOODLES={
  spring:{n:'ばね',g:'跳',d:'落ちても手札に戻ってくる'},
  twin:{n:'ふたご',g:'双',d:'数値の効果が2回発動する'},
  clone:{n:'分身',g:'分',d:'置くと、この札の分身が手札に増える'},
+ sprout:{n:'芽',g:'芽',d:'戦闘ごとに、最初に置いたときに育つ。数値がずっと+1されていく(最大+8)'},
 };
+const GROW_MAX=8;  // 育つ札の上限
 const DD_KEYS=Object.keys(DOODLES);
-const DD_KW={bomb:'bomb',wing:'float',crown:'crown',spring:'spring',twin:'twice',clone:'clone'};
+const DD_KW={bomb:'bomb',wing:'float',crown:'crown',spring:'spring',twin:'twice',clone:'clone',sprout:'grow'};
 const TRINKETS={
  domino:{name:'ドミノ',desc:'札が落ちるたび、その札の効果も発動する'},
  nezumi:{name:'ねずみ花火',desc:'楼閣完成の再発動が2回になる'},
@@ -314,6 +327,14 @@ const TRINKETS={
  hourglass:{name:'砂時計',desc:'毎ターン、手札を1枚多く引く'},
  bulb:{name:'豆電球',desc:'楼閣完成のたび、手数+1'},
  piggy:{name:'ブタの貯金箱',desc:'店に入るたび、ボタン+20'},
+ // 育つガラクタ: 使うほど、勝つほど強くなる(自己強化)
+ asagao:{name:'朝顔の鉢',desc:'戦闘に勝つたびにつるが1つ伸びる(最大3)。戦闘の始めに、伸びた数だけ調子を得る'},
+ kabuto:{name:'カブトムシの幼虫',desc:'戦闘に3回勝つとさなぎ、6回勝つと成虫になる。成虫になると、ターンの終わりに敵へ「塔の札の数×2」のダメージ'},
+ milk:{name:'給食の牛乳',desc:'戦闘に勝つたびに最大HPが1増える(最大+12)'},
+ nawatobi:{name:'なわとびの級表',desc:'楼閣を4回完成させるごとに級が上がる(最大5級)。毎ターンのはじめに、級と同じだけ守りを得る'},
+ radio:{name:'ラジオ体操のカード',desc:'毎ターンのはじめに調子+1(1回の戦闘で3まで)'},
+ sei:{name:'背比べの柱',desc:'楼閣を完成させるたびに、この戦闘の調子+3'},
+ mask:{name:'ヒーローのお面',desc:'ターンのはじめにHPが半分以下なら、この戦闘の調子+3(1回の戦闘で1回)'},
  // 遊び道具: 別のカードゲームのルールを持ち込むガラクタ(g = 元ネタ)
  poker:{name:'ポーカーチップ',g:'ポーカー',desc:'楼閣完成のとき、塔の10枚でポーカーの役を作る。強い役ほど大ダメージ(ワンペア5〜ファイブカード300)'},
  blackjack:{name:'カジノのコイン',g:'ブラックジャック',desc:'段の札がそろったとき、その段の点数がちょうど21ならブラックジャック。その段の札がもう一度発動し、敵に21ダメージ。絵札は10、Aは1か11、★は好きな数'},
@@ -340,27 +361,27 @@ const GAME_KEYS=Object.keys(TRINKETS).filter(t=>TRINKETS[t].g);
 const HACHA_HP=1.25;
 const A=(a,v,n)=>({a,v:v||0,n:n||1});
 const ENEMIES={
- dust:{name:'綿ぼこり',ch:1,hp:53,say:'ふわふわの綿ぼこりが、札の間に入り込もうとしている。',pat:[[A('atk',8)],[A('dust',1),A('atk',12)],[A('atk',18)]]},
- fish:{name:'紙魚',ch:1,hp:51,say:'紙魚(しみ)が、いちばんおいしそうな札を狙っている。',pat:[[A('snipe',1),A('atk',8)],[A('atk',20)],[A('snipe',1),A('atk',13)]]},
- fan:{name:'扇風機おばけ',ch:1,hp:58,say:'扇風機おばけが首を振るたび、上の札がさらわれる。落ちた札は、おばけにも当たる。',pat:[[A('gust',2),A('atk',6)],[A('atk',20)],[A('gust',1),A('atk',13)]]},
- soldier:{name:'ゼンマイ兵隊',ch:1,hp:49,say:'ゼンマイ兵隊が、ねじを巻くたびに強くなる。',pat:[[A('atk',5,2)],[A('str',2),A('atk',7)],[A('atk',6,2)]]},
- bear:{name:'ぬいぐるみのクマ',ch:1,hp:138,tier:'elite',say:'ぬいぐるみのクマが、綿をはみ出させながら起き上がった。',pat:[[A('atk',18)],[A('heal',15),A('block',10)],[A('quake',2),A('atk',12)],[A('atk',24)]]},
- blocks:{name:'積み木の巨人',ch:1,hp:159,tier:'elite',say:'積み木の巨人が、自分こそ本物の塔だと言い張っている。',pat:[[A('quake',2),A('atk',10)],[A('block',18),A('atk',6)],[A('gust',2),A('atk',14)],[A('atk',26)]]},
- robo:{name:'掃除ロボ「ルン」',ch:1,hp:265,tier:'boss',say:'子供部屋の主、掃除ロボ「ルン」が床を走り回る。札の並びもかき回してくる。',pat:[[A('gust',2),A('snipe',1),A('atk',10)],[A('quake',1),A('atk',18)],[A('block',14),A('atk',8)],[A('scramble'),A('atk',12)],[A('atk',26)]]},
- slime:{name:'湿気スライム',ch:2,hp:73,say:'湿気スライムが近づくと、補強がしけってしまう。',pat:[[A('damp'),A('atk',11)],[A('atk',24)],[A('block',12),A('atk',11)]]},
- fly:{name:'コバエの群れ',ch:2,hp:64,say:'コバエの群れが、ちくちくと何度も刺してくる。',pat:[[A('atk',4,3)],[A('gust',1),A('atk',11)],[A('atk',5,4)]]},
- steam:{name:'湯気の精',ch:2,hp:67,say:'湯気の精が、札をしめらせて吹き飛ばそうとする。',pat:[[A('gust',2),A('damp')],[A('atk',21)],[A('gust',1),A('atk',13)]]},
- frost:{name:'冷蔵庫の霜',ch:2,hp:81,say:'冷蔵庫の霜が、指先をかじかませる。次のターンの手数が減る。',pat:[[A('chill',1),A('atk',10)],[A('block',16),A('atk',8)],[A('atk',23)]]},
- micro:{name:'電子レンジ大王',ch:2,hp:196,tier:'elite',say:'電子レンジ大王が、チンと鳴るたびに熱くなる。',pat:[[A('str',3),A('atk',11)],[A('dust',2),A('atk',14)],[A('atk',26)],[A('block',16),A('heal',20)]]},
- mixer:{name:'ミキサー',ch:2,hp:187,tier:'elite',say:'ミキサーが回り出すと、塔の札が入れ替わる。',pat:[[A('scramble'),A('atk',5,3)],[A('atk',19)],[A('quake',2),A('atk',7,2)]]},
- vent:{name:'換気扇の主',ch:2,hp:447,tier:'boss',say:'台所の主、換気扇の主が羽根を回し始めた。油汚れで補強もしけっていく。',pat:[[A('gust',3),A('atk',12)],[A('damp'),A('scramble'),A('atk',7)],[A('atk',9,3)],[A('block',20),A('str',3)],[A('gust',2),A('atk',25)]]},
- alarm:{name:'目覚まし時計',ch:3,hp:101,say:'目覚まし時計がジリリと鳴るたび、土台が揺れる。',pat:[[A('quake',1),A('atk',12)],[A('quake',1),A('atk',14)],[A('quake',2),A('atk',19)]]},
- rubber:{name:'輪ゴム鉄砲',ch:3,hp:93,say:'輪ゴム鉄砲が、いちばん高い札に狙いを定めた。',pat:[[A('snipe',1),A('atk',14)],[A('atk',26)],[A('snipe',1),A('atk',17)]]},
- slipper:{name:'スリッパ',ch:3,hp:110,say:'スリッパが、パタンと振り下ろされる。',pat:[[A('atk',29)],[A('quake',2),A('atk',12)],[A('block',20),A('atk',9)]]},
- handy:{name:'ハンディ掃除機',ch:3,hp:98,say:'ハンディ掃除機が、札を吸い込もうと近づいてくる。',pat:[[A('suck',2),A('atk',12)],[A('spit'),A('atk',12)],[A('gust',1),A('atk',20)]]},
- cat:{name:'猫のタマ',ch:3,hp:261,tier:'elite',say:'猫のタマが、じゃれる気満々でこちらを見ている。',pat:[[A('atk',29)],[A('quake',2),A('atk',15)],[A('gust',3),A('atk',14)],[A('block',20),A('str',4)]]},
- dog:{name:'犬のポチ',ch:3,hp:265,tier:'elite',say:'犬のポチが、しっぽを振りながら飛びかかってくる。',pat:[[A('atk',8,4)],[A('quake',2),A('atk',15)],[A('str',3),A('atk',20)],[A('atk',32)]]},
- vacuum:{name:'掃除機「ブオーン」',ch:3,hp:653,tier:'boss',say:'大掃除の主役、掃除機「ブオーン」が唸りを上げた。吸い込んだ札は、あとで吐き出してくる。',pat:[[A('gust',2),A('atk',15)],[A('suck',3),A('atk',9)],[A('spit'),A('block',22)],[A('quake',2),A('atk',19),A('str',3)],[A('atk',39)]]},
+ dust:{name:'綿ぼこり',ch:1,hp:55,say:'ふわふわの綿ぼこりが、札の間に入り込もうとしている。',pat:[[A('atk',8)],[A('dust',1),A('atk',12)],[A('atk',18)]]},
+ fish:{name:'紙魚',ch:1,hp:53,say:'紙魚(しみ)が、いちばんおいしそうな札を狙っている。',pat:[[A('snipe',1),A('atk',8)],[A('atk',20)],[A('snipe',1),A('atk',13)]]},
+ fan:{name:'扇風機おばけ',ch:1,hp:60,say:'扇風機おばけが首を振るたび、上の札がさらわれる。落ちた札は、おばけにも当たる。',pat:[[A('gust',2),A('atk',6)],[A('atk',20)],[A('gust',1),A('atk',13)]]},
+ soldier:{name:'ゼンマイ兵隊',ch:1,hp:51,say:'ゼンマイ兵隊が、ねじを巻くたびに強くなる。',pat:[[A('atk',5,2)],[A('str',2),A('atk',7)],[A('atk',6,2)]]},
+ bear:{name:'ぬいぐるみのクマ',ch:1,hp:144,tier:'elite',say:'ぬいぐるみのクマが、綿をはみ出させながら起き上がった。',pat:[[A('atk',18)],[A('heal',15),A('block',10)],[A('quake',2),A('atk',12)],[A('atk',24)]]},
+ blocks:{name:'積み木の巨人',ch:1,hp:165,tier:'elite',say:'積み木の巨人が、自分こそ本物の塔だと言い張っている。',pat:[[A('quake',2),A('atk',10)],[A('block',18),A('atk',6)],[A('gust',2),A('atk',14)],[A('atk',26)]]},
+ robo:{name:'掃除ロボ「ルン」',ch:1,hp:276,tier:'boss',say:'子供部屋の主、掃除ロボ「ルン」が床を走り回る。札の並びもかき回してくる。',pat:[[A('gust',2),A('snipe',1),A('atk',10)],[A('quake',1),A('atk',18)],[A('block',14),A('atk',8)],[A('scramble'),A('atk',12)],[A('atk',26)]]},
+ slime:{name:'湿気スライム',ch:2,hp:76,say:'湿気スライムが近づくと、補強がしけってしまう。',pat:[[A('damp'),A('atk',11)],[A('atk',24)],[A('block',12),A('atk',11)]]},
+ fly:{name:'コバエの群れ',ch:2,hp:67,say:'コバエの群れが、ちくちくと何度も刺してくる。',pat:[[A('atk',4,3)],[A('gust',1),A('atk',11)],[A('atk',5,4)]]},
+ steam:{name:'湯気の精',ch:2,hp:70,say:'湯気の精が、札をしめらせて吹き飛ばそうとする。',pat:[[A('gust',2),A('damp')],[A('atk',21)],[A('gust',1),A('atk',13)]]},
+ frost:{name:'冷蔵庫の霜',ch:2,hp:84,say:'冷蔵庫の霜が、指先をかじかませる。次のターンの手数が減る。',pat:[[A('chill',1),A('atk',10)],[A('block',16),A('atk',8)],[A('atk',23)]]},
+ micro:{name:'電子レンジ大王',ch:2,hp:204,tier:'elite',say:'電子レンジ大王が、チンと鳴るたびに熱くなる。',pat:[[A('str',3),A('atk',11)],[A('dust',2),A('atk',14)],[A('atk',26)],[A('block',16),A('heal',20)]]},
+ mixer:{name:'ミキサー',ch:2,hp:194,tier:'elite',say:'ミキサーが回り出すと、塔の札が入れ替わる。',pat:[[A('scramble'),A('atk',5,3)],[A('atk',19)],[A('quake',2),A('atk',7,2)]]},
+ vent:{name:'換気扇の主',ch:2,hp:465,tier:'boss',say:'台所の主、換気扇の主が羽根を回し始めた。油汚れで補強もしけっていく。',pat:[[A('gust',3),A('atk',12)],[A('damp'),A('scramble'),A('atk',7)],[A('atk',9,3)],[A('block',20),A('str',3)],[A('gust',2),A('atk',25)]]},
+ alarm:{name:'目覚まし時計',ch:3,hp:105,say:'目覚まし時計がジリリと鳴るたび、土台が揺れる。',pat:[[A('quake',1),A('atk',12)],[A('quake',1),A('atk',14)],[A('quake',2),A('atk',19)]]},
+ rubber:{name:'輪ゴム鉄砲',ch:3,hp:97,say:'輪ゴム鉄砲が、いちばん高い札に狙いを定めた。',pat:[[A('snipe',1),A('atk',14)],[A('atk',26)],[A('snipe',1),A('atk',17)]]},
+ slipper:{name:'スリッパ',ch:3,hp:114,say:'スリッパが、パタンと振り下ろされる。',pat:[[A('atk',29)],[A('quake',2),A('atk',12)],[A('block',20),A('atk',9)]]},
+ handy:{name:'ハンディ掃除機',ch:3,hp:102,say:'ハンディ掃除機が、札を吸い込もうと近づいてくる。',pat:[[A('suck',2),A('atk',12)],[A('spit'),A('atk',12)],[A('gust',1),A('atk',20)]]},
+ cat:{name:'猫のタマ',ch:3,hp:271,tier:'elite',say:'猫のタマが、じゃれる気満々でこちらを見ている。',pat:[[A('atk',29)],[A('quake',2),A('atk',15)],[A('gust',3),A('atk',14)],[A('block',20),A('str',4)]]},
+ dog:{name:'犬のポチ',ch:3,hp:276,tier:'elite',say:'犬のポチが、しっぽを振りながら飛びかかってくる。',pat:[[A('atk',8,4)],[A('quake',2),A('atk',15)],[A('str',3),A('atk',20)],[A('atk',32)]]},
+ vacuum:{name:'掃除機「ブオーン」',ch:3,hp:679,tier:'boss',say:'大掃除の主役、掃除機「ブオーン」が唸りを上げた。吸い込んだ札は、あとで吐き出してくる。',pat:[[A('gust',2),A('atk',15)],[A('suck',3),A('atk',9)],[A('spit'),A('block',22)],[A('quake',2),A('atk',19),A('str',3)],[A('atk',39)]]},
 };
 const CHAPTERS=[null,
  {name:'子供部屋',rooms:['','引き出し','おもちゃ箱','本棚','ベッドの下','机の上','窓辺','カーテンの裏','子供部屋の床'],normal:['dust','fish','fan','soldier'],elite:['bear','blocks'],boss:'robo',hpM:1,atkM:1},
@@ -402,6 +423,11 @@ const ri=(st,n)=>Math.floor(rnd(st)*n);
 const pick=(st,a)=>a[ri(st,a.length)];
 function shuffle(st,a){for(let i=a.length-1;i>0;i--){const j=ri(st,i+1);const t=a[i];a[i]=a[j];a[j]=t;}return a;}
 const has=(run,id)=>run.tr.includes(id);
+const KABUTO_ST=['幼虫','さなぎ','成虫'];
+const kabutoStage=run=>{const n=run.kabuto||0;return n>=6?2:n>=3?1:0;};
+const nawaGrade=run=>Math.min(5,Math.floor((run.nawa||0)/4));
+// 育つガラクタの今の状態(地図の上のガラクタ一覧と説明に出す)
+function trState(run,id){if(!run)return'';switch(id){case'asagao':return(run.asagao||0)+'/3';case'kabuto':return KABUTO_ST[kabutoStage(run)];case'milk':return'+'+(run.milk||0);case'nawatobi':return nawaGrade(run)?nawaGrade(run)+'級':'';}return'';}
 const towerCount=b=>b.tower.reduce((n,x)=>n+(x?1:0),0);
 // --- 遊び道具の判定 ---
 const NAT='SDCH';
@@ -450,11 +476,12 @@ function hanaReady(b,T){const R=new Set(T.filter(Boolean).map(X=>X.c.r));
 function cdata(inst){const b=CARDS[inst.d];let fx=b.fx,kw=b.kw,cost=b.cost;
  if(inst.up){fx=Object.assign({},fx);let t=0;
   for(const k of['dmg','grd'])if(fx[k]){fx[k]+=fx[k]>=6?3:2;t=1;}
-  if(fx.brc){fx.brc+=1;t=1;}if(fx.heal){fx.heal+=2;t=1;}if(fx.weak){fx.weak+=1;t=1;}
+  if(fx.brc){fx.brc+=1;t=1;}if(fx.heal){fx.heal+=2;t=1;}if(fx.weak){fx.weak+=1;t=1;}if(fx.cho){fx.cho+=1;t=1;}
   if(fx.dmgT||fx.grdT||fx.healT||kw.echo||fx.flip||fx.mirror||fx.multiply||fx.shuffle||fx.lull||fx.swap||fx.det){cost=Math.max(0,cost-1);t=1;}
   if(!t&&fx.draw)fx.draw+=1;}
+ if(inst.gr){fx=Object.assign({},fx);let t=0;for(const k of['dmg','grd','heal'])if(fx[k]){fx[k]+=inst.gr;t=1;}if(!t&&fx.brc)fx.brc+=Math.floor(inst.gr/2);}
  if(inst.dd){kw=Object.assign({},kw);kw[DD_KW[inst.dd]]=1;}
- return Object.assign({},b,{fx,kw,cost,up:inst.up?1:0,dd:inst.dd||''});}
+ return Object.assign({},b,{fx,kw,cost,up:inst.up?1:0,dd:inst.dd||'',gr:inst.gr||0});}
 const canUpgrade=inst=>!inst.up&&CARDS[inst.d].rar!=='x';
 const canDoodle=inst=>!inst.dd&&CARDS[inst.d].rar!=='x';
 function label(c){return(c.name||(SUIT[c.s].sym+RANKN(c.r)))+(c.up?'+':'');}
@@ -476,10 +503,11 @@ function fxLines(c,m){const F=c.fx,K=c.kw,L=[],s=m===0,big=m===2;
  if(F.flip)L.push(s?'返し':big?'全札落下×3':'全札を落とす');
  if(F.det)L.push(s?'起爆':'爆弾を起爆');
  if(F.swap)L.push(s?'入替':'手札入れ替え');
+ if(F.cho)L.push((s?'調':'調子+')+F.cho);
  if(K.bomb)L.push('爆発');if(K.chain)L.push('将棋倒し');if(K.spring)L.push('ばね');if(K.crown)L.push('倍率×2');if(K.twice)L.push('2回発動');if(K.clone)L.push('分身');
  if(K.pierce)L.push('貫通');if(K.aura)L.push('支援+'+K.aura);if(K.cheer)L.push(K.cheer>1?'応援+'+K.cheer:'応援');
  if(K.float)L.push('浮遊');if(K.echo)L.push(big?'直前の札を再演':'再演');
- if(K.steady)L.push('不動');if(K.base)L.push(s?'土台':'土台専用');if(K.dust)L.push('効果なし');
+ if(K.steady)L.push('不動');if(K.base)L.push(s?'土台':'土台専用');if(K.dust)L.push('効果なし');if(K.grow&&!s)L.push('育つ');
  return L;}
 function desc(c){const F=c.fx,K=c.kw,L=[];
  if(F.dmg)L.push('攻撃'+F.dmg);if(F.dmgT)L.push('攻撃(塔の札の数×'+F.dmgT+')');if(F.grd)L.push('守り'+F.grd);if(F.grdT)L.push('守り(塔の札の数×'+F.grdT+')');
@@ -494,6 +522,8 @@ function desc(c){const F=c.fx,K=c.kw,L=[];
  if(K.float)L.push('浮遊(支えなしで置ける)');if(K.echo)L.push('再演(直前に置いた札をこの段の倍率で発動)');
  if(K.steady)L.push('不動(ノックで落ちない)');if(K.base)L.push('土台専用');if(K.dust)L.push('効果なし');
  if(K.spare)L.push('予備の札(デッキが'+MIN_DECK+'枚に足りない戦闘だけ、足りない分が入る。戦闘が終わると消える)');
+ if(F.cho)L.push('調子+'+F.cho+'(この戦闘のあいだ、札を置くたびに攻撃・守り・回復が+'+F.cho+'。段の倍率や再発動では増えない)');
+ if(K.grow)L.push('育つ(戦闘ごとに、最初に置いたときに数値がずっと+1。最大+'+GROW_MAX+(c.gr?'、いま+'+c.gr:'')+')');
  return L.join('・');}
 const actVal=(x,e)=>Math.round(x.v*(e.am||1))+(e.str||0);
 function actLabel(x,e){switch(x.a){case'atk':return'攻撃 '+actVal(x,e)+(x.n>1?'×'+x.n:'');case'gust':return'突風 '+x.v;case'quake':return'揺れ '+x.v;case'snipe':return'狙い';case'damp':return'湿気';case'block':return'防御 '+x.v;case'str':return'強化 '+x.v;case'dust':return'ホコリ '+x.v;case'suck':return'吸引 '+x.v;case'spit':return'吐き出し '+e.bag.length+'枚';case'heal':return'回復 '+x.v;case'scramble':return'かき回し';case'chill':return'かじかみ '+x.v;}return'';}
@@ -541,7 +571,7 @@ function gameChoices(run,n){return shuffle(run.rng,freeTrinkets(run,true)).slice
 function upgradeCard(run,u){const x=run.deck.find(c=>c.u===u);if(x&&canUpgrade(x)){x.up=1;return true;}return false;}
 function removeCard(run,u){const i=run.deck.findIndex(c=>c.u===u);if(i>=0&&run.deck.length>MIN_DECK){run.deck.splice(i,1);return true;}return false;}
 function doodleCard(run,u,dd){const x=run.deck.find(c=>c.u===u);if(x&&canDoodle(x)){x.dd=dd;return true;}return false;}
-function dupCard(run,u){const x=run.deck.find(c=>c.u===u);if(!x)return false;run.deck.push({u:run.uid++,d:x.d,up:x.up,dd:x.dd});run.hp=Math.max(1,run.hp-6);return true;}
+function dupCard(run,u){const x=run.deck.find(c=>c.u===u);if(!x)return false;run.deck.push({u:run.uid++,d:x.d,up:x.up,dd:x.dd,gr:x.gr||0});run.hp=Math.max(1,run.hp-6);return true;}
 function sellPrice(inst,mul){return Math.round((SELL[CARDS[inst.d].rar]+(inst.up?15:0)+(inst.dd?10:0))*(mul||1));}
 function sellCard(run,u,mul){const i=run.deck.findIndex(c=>c.u===u);if(i<0||run.deck.length<=MIN_DECK)return -1;const p=sellPrice(run.deck[i],mul);run.deck.splice(i,1);run.btn+=p;run.sold++;return p;}
 function microwave(run,u){const x=run.deck.find(c=>c.u===u);if(!x)return'';const nm=label(cdata(x));
@@ -563,7 +593,7 @@ const EVENTS=[
   {l:'ひげをもらう(半々でガラクタか、HP-10)',f:run=>{if(rnd(run.rng)<0.5){const t=randTrinket(run);if(t){run.tr.push(t);return'ひげの下に「'+TRINKETS[t].name+'」が落ちていた。';}run.btn+=40;return'ボタンを40枚見つけた。';}run.hp=Math.max(1,run.hp-10);return'しっぽで払われた。HP-10。';}},
   {l:'そっと通る',f:()=>'起こさないように通り過ぎた。'}]},
  {id:'magic',title:'古い手品師のトランプ',text:'引き出しの奥に、手品師が使っていた古い札束がある。数字札を1枚、ジョーカーかちゃぶ台返しに描き換えてくれるらしい。',ch:[
-  {l:'描き換える(HP-6、いちばん弱い数字札が化ける)',f:run=>{const cand=run.deck.filter(x=>CARDS[x.d].rar==='st').sort((a,b)=>CARDS[a.d].r-CARDS[b.d].r);if(!cand.length)return'描き換えられる札がなかった。';const x=cand[0],old=label(cdata(x));x.d=rnd(run.rng)<.5?'jk':'jf';x.up=0;run.hp=Math.max(1,run.hp-6);return old+'が「'+CARDS[x.d].name+'」に化けた。';}},
+  {l:'描き換える(HP-6、いちばん弱い数字札が化ける)',f:run=>{const cand=run.deck.filter(x=>CARDS[x.d].rar==='st').sort((a,b)=>CARDS[a.d].r-CARDS[b.d].r);if(!cand.length)return'描き換えられる札がなかった。';const x=cand[0],old=label(cdata(x));x.d=rnd(run.rng)<.5?'jk':'jf';x.up=0;x.gr=0;run.hp=Math.max(1,run.hp-6);return old+'が「'+CARDS[x.d].name+'」に化けた。';}},
   {l:'断る',f:()=>'そっと引き出しを閉めた。'}]},
  {id:'sun',title:'窓辺の日だまり',text:'あたたかい日差しが床を照らしている。少し湿った札も、ここなら乾かせそうだ。',ch:[
   {l:'ひなたぼっこ(HP+15)',f:run=>{const v=Math.min(15,run.maxHp-run.hp);run.hp+=v;return'HPが'+v+'回復した。';}},
@@ -592,6 +622,10 @@ const EVENTS=[
  {id:'flea',title:'フリーマーケット',text:'おもちゃたちがフリーマーケットを開いている。古い札が高く売れるらしい。',ch:[
   {l:'札を1枚売る(いつもの2倍の値段)',pickSell2:1},
   {l:'ひやかすだけ(ボタン+5)',f:run=>{run.btn+=5;return'おまけにボタンを5枚もらった。';}}]},
+ {id:'diary',title:'朝顔の観察日記',text:'ランドセルから、夏休みの観察日記がはみ出している。朝顔の種も一緒に入っていた。札に種をまけば、使うほど育つらしい。',ch:[
+  {l:'種をまく(札1枚に「芽」の落書き)',pickSprout:1},
+  {l:run=>has(run,'asagao')?'水やりを手伝う(ボタン+20)':'鉢ごともらう(HP-5、ガラクタ「朝顔の鉢」)',f:run=>{if(!has(run,'asagao')){run.hp=Math.max(1,run.hp-5);run.tr.push('asagao');return'朝顔の鉢を手に入れた。戦闘に勝つたびにつるが伸びて、戦闘の始めの調子が上がっていく。';}run.btn+=20;return'お礼にボタンを20枚もらった。';}},
+  {l:'宿題は後回し(ボタン+10)',f:run=>{run.btn+=10;return'観察日記を閉じて、ボタンを10枚拾った。';}}]},
  {id:'games',title:'押し入れの遊び道具箱',text:'押し入れの奥から、古いカードゲームの道具が詰まった箱が出てきた。ポーカーチップ、花札、タロット……。1つなら持っていけそうだ。',ch:[
   {l:'箱をあさる(HP-4、遊び道具のガラクタ3つから1つを選ぶ)',pickGame:1},
   {l:'そっと閉じる',f:()=>'箱を押し入れに戻した。'}]},
@@ -600,9 +634,9 @@ function startBattle(run,eid,f){const E=ENEMIES[eid],C=CHAPTERS[run.ch],lv=run.l
  if(!E.tier&&lv>=1)hp*=1.1;if(E.tier&&lv>=2)hp*=1.1;if(run.hacha)hp*=HACHA_HP;hp=Math.round(hp);
  const str=(lv>=4?1:0)+(lv>=10?2:0)+(E.tier==='boss'&&lv>=9?2:0),am=C.atkM*(E.tier==='elite'&&lv>=8?1.15:1);
  run.b={eid,f,hp:run.hp,maxHp:run.maxHp,grd:0,brc:has(run,'clip')?2:0,act:0,wedge:0,cheer:0,tape:0,turn:0,tmpN:0,ok:0,weak:0,lull:0,chill:0,
-  draw:shuffle(run.rng,run.deck.map(x=>({u:x.u,d:x.d,up:x.up,dd:x.dd||''}))),hand:[],disc:[],tower:Array(10).fill(null),
+  draw:shuffle(run.rng,run.deck.map(x=>({u:x.u,d:x.d,up:x.up,dd:x.dd||'',gr:x.gr||0}))),hand:[],disc:[],tower:Array(10).fill(null),
   en:{hp,max:hp,blk:0,str,am,step:0,mark:-1,bag:[]},last:null,crowns:0,over:'',
-  placed:0,hang:0,rev:0,hana:{},trump:'',tarot:'',bet:0,moonShown:0};
+  placed:0,hang:0,rev:0,hana:{},trump:'',tarot:'',bet:0,moonShown:0,cho:0,asa:0,grown:[],radio:0,mask:0};
  const b=run.b,lack=Math.max(0,MIN_DECK-run.deck.length);
  // デッキが10枚に足りないとき(古いセーブなど)は、戦闘のあいだだけ予備の札で補う
  for(let i=0;i<lack;i++)b.draw.push({u:-(++b.tmpN),d:'spare',up:0,dd:'',tmp:1});
@@ -612,6 +646,7 @@ function startBattle(run,eid,f){const E=ENEMIES[eid],C=CHAPTERS[run.ch],lv=run.l
  if(has(run,'trump'))b.trump=pick(run.rng,[...NAT]);
  if(has(run,'tarot')){b.tarot=pick(run.rng,TAROT_KEYS);if(b.tarot==='wheel'){tmpCard();tmpCard();}if(b.tarot==='death')b.en.hp=Math.max(1,b.en.hp-Math.round(b.en.max*.15));}
  if(has(run,'chips')){const bet=Math.min(50,Math.floor(run.btn/2));if(bet>0){run.btn-=bet;b.bet=bet;}}
+ if(has(run,'asagao')&&run.asagao){b.asa=run.asagao;b.cho+=run.asagao;}
  setIntent(run);return run.b;}
 function setIntent(run){const b=run.b,e=b.en,pat=ENEMIES[b.eid].pat[e.step];e.mark=-1;
  if(pat.some(x=>x.a==='snipe')){const occ=[];for(let k=0;k<10;k++)if(b.tower[k])occ.push(k);
@@ -633,6 +668,9 @@ function startTurn(run){const b=run.b;b.turn++;b.grd=0;b.tape=0;b.wedge=0;b.chee
  b.placed=0;b.hang=0;b.speedN=0;
  b.act=Math.max(1,3+(b.turn===1&&has(run,'band')?1:0)+(b.tarot==='fool'?1:0)-b.chill);b.chill=0;const fx=[];
  if(b.tarot==='sun'){const v=Math.min(3,b.maxHp-b.hp);if(v>0){b.hp+=v;fx.push({t:'heal',v});}}
+ if(has(run,'radio')&&b.radio<3){b.radio++;b.cho++;fx.push({t:'cho',v:1,by:'radio'});}
+ if(has(run,'mask')&&!b.mask&&b.hp*2<=b.maxHp){b.mask=1;b.cho+=3;fx.push({t:'cho',v:3,by:'mask'});}
+ if(has(run,'nawatobi')&&nawaGrade(run)){const v=nawaGrade(run);b.grd+=v;fx.push({t:'grd',v,by:'nawatobi'});}
  drawN(run,5+(has(run,'hourglass')?1:0),fx);return fx;}
 function multFor(run,c,k){const b=run.b,t=tierOf(k);let m=MULT[t];const parts=[];
  if(t>0){const[a,d]=sups(k);const X=b.tower[a],Y=b.tower[d];
@@ -658,23 +696,23 @@ function canPlace(run,hi,k){const b=run.b,inst=b.hand[hi];if(!inst)return{ok:0,w
 function hitEnemy(run,v,pierce,fx,src){const b=run.b,e=b.en;let d=Math.max(0,Math.round(v));if(!d)return;
  if(!pierce&&e.blk>0){const a=Math.min(e.blk,d);e.blk-=a;d-=a;if(a)fx.push({t:'blocked',v:a});}
  if(!d)return;const before=e.hp;e.hp=Math.max(0,e.hp-d);b.ok+=d-(before-e.hp);fx.push({t:'dmg',to:'e',v:d,src:src||'card'});}
-function applyNum(run,c,m,k,fx){const b=run.b,F=c.fx,reps=c.kw.twice?2:1,o=(tierOf(k)===0&&has(run,'ohajiki'))?1:0;
+function applyNum(run,c,m,k,fx,placed){const b=run.b,F=c.fx,reps=c.kw.twice?2:1,o=(tierOf(k)===0&&has(run,'ohajiki'))?1:0,p=placed?(b.cho||0):0;  // p = 調子(置いたときだけ)
  if(b.rev&&c.r>=1&&c.r<=5)m*=2;
  const moon=(F.heal||F.healT)&&has(run,'moon')&&heartCount(run)>=4;
  for(let r=0;r<reps;r++){
-  if(moon){const v=((F.heal?F.heal+o:0)+(F.healT||0)*towerCount(b))*m;if(!b.moonShown){b.moonShown=1;fx.push({t:'trick',n:'シュート・ザ・ムーン'});}hitEnemy(run,v,false,fx);}
-  if(F.dmg)hitEnemy(run,(F.dmg+o)*m,c.kw.pierce,fx);
+  if(moon){const v=((F.heal?F.heal+o:0)+(F.healT||0)*towerCount(b))*m+(F.heal?p:0);if(!b.moonShown){b.moonShown=1;fx.push({t:'trick',n:'シュート・ザ・ムーン'});}hitEnemy(run,v,false,fx);}
+  if(F.dmg)hitEnemy(run,(F.dmg+o)*m+p,c.kw.pierce,fx);
   if(F.dmgT)hitEnemy(run,F.dmgT*towerCount(b)*m,c.kw.pierce,fx);
-  if(F.grd){const v=(F.grd+o)*m;b.grd+=v;fx.push({t:'grd',v});}
+  if(F.grd){const v=(F.grd+o)*m+p;b.grd+=v;fx.push({t:'grd',v});}
   if(F.grdT){const v=F.grdT*towerCount(b)*m;b.grd+=v;fx.push({t:'grd',v});}
   if(F.brc){const v=(F.brc+o)*m;b.brc+=v;fx.push({t:'brc',v});}
-  if(F.heal||F.healT){const v=Math.min(((F.heal?F.heal+o:0)+(F.healT||0)*towerCount(b))*m,b.maxHp-b.hp);if(v>0){b.hp+=v;fx.push({t:'heal',v});}}
+  if(F.heal||F.healT){const v=Math.min(((F.heal?F.heal+o:0)+(F.healT||0)*towerCount(b))*m+(F.heal?p:0),b.maxHp-b.hp);if(v>0){b.hp+=v;fx.push({t:'heal',v});}}
   if(F.weak){const v=F.weak*m;b.weak+=v;fx.push({t:'weak',v});}
   if(F.lull&&!b.lull){b.lull=1;fx.push({t:'lull'});}
   if(F.draw)drawN(run,F.draw,fx);
   if(F.act)b.act+=F.act;}}
 function retrig(run,X,k,fx){const c=X.c.kw.echo?X.echo:X.c;if(c)applyNum(run,c,X.m,k,fx);}
-function addTemp(run,p){const b=run.b;if(b.hand.length>=10)return 0;b.hand.push({u:-(++b.tmpN),d:p.d,up:p.up?1:0,dd:p.dd||'',tmp:1});return 1;}
+function addTemp(run,p){const b=run.b;if(b.hand.length>=10)return 0;b.hand.push({u:-(++b.tmpN),d:p.d,up:p.up?1:0,dd:p.dd||'',gr:p.gr||0,tmp:1});return 1;}
 function fallDmg(run,k){return MULT[tierOf(k)]*FALL*(has(run,'pachinko')?2:1)*(tarotIs(run,'tower')?2:1);}
 function land(run,X,why,fx){const b=run.b,inst=X.i;
  if(inst.tmp&&inst.d==='dust'&&why==='crown')return;
@@ -697,7 +735,8 @@ function topple(run,list,fx,why,mul){const b=run.b,q=list.slice(),init=new Set(l
   if(!more)break;}}
 function applySpecial(run,c,m,k,fx){const b=run.b,F=c.fx;
  if(c.kw.cheer)b.cheer+=c.kw.cheer;
- if(c.kw.clone&&addTemp(run,{d:c.id,up:c.up}))fx.push({t:'clone',n:1});
+ if(F.cho){b.cho+=F.cho;fx.push({t:'cho',v:F.cho});}
+ if(c.kw.clone&&addTemp(run,{d:c.id,up:c.up,gr:c.gr}))fx.push({t:'clone',n:1});
  if(F.multiply){const src=b.hand.slice();let n=0;for(const h of src)n+=addTemp(run,h);fx.push({t:'clone',n});}
  if(F.swap){const n=b.hand.length;b.disc.push(...b.hand);b.hand=[];drawN(run,n,fx);fx.push({t:'swap',n});}
  if(F.mirror){if(tierOf(k)>0){const[a,d]=sups(k);for(const s of[a,d]){const X=b.tower[s];if(X){const cc=X.c.kw.echo?X.echo:X.c;if(cc)applyNum(run,cc,m,s,fx);}}fx.push({t:'mirror'});}else fx.push({t:'msg',s:'映す札がない'});}
@@ -712,13 +751,17 @@ function placeCard(run,hi,k){const b=run.b,chk=canPlace(run,hi,k);if(!chk.ok)ret
  const fx=[{t:'place',k,m:chk.m,parts:chk.parts,c,free:chk.cost<c.cost}];
  const echo=c.kw.echo?b.last:null;
  b.tower[k]={i:inst,c,m:chk.m,echo};
- const fire=()=>{if(c.kw.echo){if(echo)applyNum(run,echo,chk.m,k,fx);else fx.push({t:'msg',s:'再演する札がない'});}else applyNum(run,c,chk.m,k,fx);};
+ const fire=()=>{if(c.kw.echo){if(echo)applyNum(run,echo,chk.m,k,fx,1);else fx.push({t:'msg',s:'再演する札がない'});}else applyNum(run,c,chk.m,k,fx,1);};
  fire();if(!c.kw.echo)b.last=c;
  if(has(run,'kagami')&&c.r>0&&rowNb(k).some(n=>b.tower[n]&&b.tower[n].c.r===c.r)){fx.push({t:'msg',s:'合わせ鏡でもう一度'});fire();}
  applySpecial(run,c,chk.m,k,fx);
+ grow(run,inst,k,fx);
  checkTricks(run,k,inst,c,chk.m,prev,fx);
  if(b.en.hp>0)checkCrown(run,fx);
  checkEnd(run,fx);trackBest(run,fx);return fx;}
+// 育つ札: 戦闘ごとに、最初に置いたときに育つ(デッキの札にも書き込むので、ランのあいだずっと残る)
+function grow(run,inst,k,fx){const b=run.b,X=b.tower[k];if(!X||!X.c.kw.grow||inst.tmp)return;const done=b.grown||(b.grown=[]);if(done.includes(inst.u))return;done.push(inst.u);
+ const g=Math.min(GROW_MAX,(inst.gr||0)+1);if(g<=(inst.gr||0))return;inst.gr=g;const D=run.deck.find(q=>q.u===inst.u);if(D)D.gr=g;X.c=cdata(inst);fx.push({t:'grow',v:g});}
 // 置いた直後に起きる遊び道具の効果(早取り・ペア・ババ・七並べ・花札・革命・ブラックジャック)
 function checkTricks(run,k,inst,c,m,prev,fx){const b=run.b,here=()=>{const X=b.tower[k];return X&&X.i===inst;};
  const again=()=>{if(!c.kw.echo)applyNum(run,c,m,k,fx);else if(prev)applyNum(run,prev,m,k,fx);};
@@ -754,6 +797,8 @@ function checkCrown(run,fx){const b=run.b;if(b.tower.some(x=>!x))return;
   if(cand.length){const X=pick(run.rng,cand),dd=randDoodle(run);X.i.dd=dd;const D=run.deck.find(q=>q.u===X.i.u);if(D)D.dd=dd;X.c=cdata(X.i);fx.push({t:'doodle',dd,c:label(X.c)});}}
  if(has(run,'eraser')){const v=Math.min(4,b.maxHp-b.hp);if(v>0){b.hp+=v;fx.push({t:'heal',v});}}
  if(has(run,'bulb'))b.act+=1;
+ if(has(run,'sei')){b.cho+=3;fx.push({t:'cho',v:3,by:'sei'});}
+ if(has(run,'nawatobi')){const g0=nawaGrade(run);run.nawa=(run.nawa||0)+1;if(nawaGrade(run)>g0)fx.push({t:'msg',s:'なわとびが'+nawaGrade(run)+'級に上がった'});}
  const occ=[];for(let k=9;k>=0;k--)occ.push(k);
  topple(run,occ,fx,'crown',1);}
 function checkEnd(run,fx){const b=run.b;if(b.over)return;if(b.en.hp<=0){b.over='win';fx.push({t:'win'});}else if(b.hp<=0){b.over='lose';fx.push({t:'lose'});}}
@@ -791,7 +836,9 @@ function doAct(run,x,fx){const b=run.b,e=b.en;
   case'chill':b.chill+=x.v;fx.push({t:'chill',v:x.v});break;
   case'dust':for(let i=0;i<x.v;i++)b.disc.push({u:-(++b.tmpN),d:'dust',up:0,dd:'',tmp:1});fx.push({t:'dust',v:x.v});break;}
  checkEnd(run,fx);}
-function endTurn(run){const b=run.b,fx=[];b.cheer=0;b.disc.push(...b.hand);b.hand=[];const e=b.en;e.blk=0;
+function endTurn(run){const b=run.b,fx=[];b.cheer=0;b.disc.push(...b.hand);b.hand=[];const e=b.en;
+ if(has(run,'kabuto')&&kabutoStage(run)===2){const v=towerCount(b)*2;if(v){hitEnemy(run,v,false,fx,'kabuto');fx.push({t:'beetle',v});checkEnd(run,fx);}}
+ e.blk=0;
  const pat=ENEMIES[b.eid].pat;for(const x of pat[e.step]){if(b.over)break;doAct(run,x,fx);}
  if(!b.over){e.step=(e.step+1)%pat.length;setIntent(run);}
  checkEnd(run,fx);return fx;}
@@ -801,15 +848,19 @@ function finishBattle(run){const b=run.b,E=ENEMIES[b.eid],st=run.rng;run.hp=Math
  let btn=E.tier==='boss'?60+ri(st,21):E.tier==='elite'?28+ri(st,13):14+ri(st,8);if(has(run,'gbutton'))btn+=10;
  const ok=has(run,'maneki')?Math.min(50,b.ok):0;btn+=ok;run.btn+=btn;
  const bet=b.bet?{v:b.bet,won:b.turn<=4}:null;if(bet&&bet.won)run.btn+=bet.v*2;
+ const grew=[];
+ if(has(run,'asagao')&&(run.asagao||0)<3){run.asagao=(run.asagao||0)+1;grew.push('朝顔のつるが伸びた('+run.asagao+'/3)');}
+ if(has(run,'kabuto')){const s0=kabutoStage(run);run.kabuto=(run.kabuto||0)+1;const s1=kabutoStage(run);if(s1>s0)grew.push(s1===2?'カブトムシが成虫になった!':'カブトムシの幼虫がさなぎになった');}
+ if(has(run,'milk')&&(run.milk||0)<12){run.milk=(run.milk||0)+1;run.maxHp++;run.hp++;grew.push('給食の牛乳で最大HP+1');}
  const cards=offerCards(run,E.tier==='boss'?[0,30,70]:E.tier==='elite'?[35,45,20]:[62,32,6],3,E.tier?.5:.25);
- const tr=E.tier==='elite'?randTrinket(run):null;if(tr)run.tr.push(tr);run.b=null;return{btn,ok,heal,cards,tr,bet,boss:E.tier==='boss'?1:0};}
+ const tr=E.tier==='elite'?randTrinket(run):null;if(tr)run.tr.push(tr);run.b=null;return{btn,ok,heal,cards,tr,bet,grew,boss:E.tier==='boss'?1:0};}
 const chapterHeal=run=>Math.round((run.maxHp-run.hp)*.6);
 function nextChapter(run,tr){const heal=chapterHeal(run);run.hp+=heal;if(tr&&!run.tr.includes(tr))run.tr.push(tr);run.ch++;run.floor=0;run.node=0;run.lastE='';run.map=genMap(run);return heal;}
 function memOf(run){const floors=(run.ch-1)*8+run.floor;return Math.round((floors*3+run.bosses*15+run.elites*8+(run.won?30:0))*(1+run.lv*.1));}
 // ==ENGINE END==
 // ---------- UI ----------
 const app=document.getElementById('app');
-const VERSION='1.0.2';
+const VERSION='1.1.0';
 const KEY_RUN='satsujo-run-v3',KEY_META='satsujo-meta-v3',KEY_TUT='satsujo-tut-v3';
 const store={get(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}},del(k){try{localStorage.removeItem(k);}catch(e){}}};
 const META0=()=>({total:0,runs:0,wins:0,best:0,maxLv:0,cleared:{},seen:{c:[],r:[],e:[]},all:false,sound:true,fast:false,daily:null,last:{troupe:'spade',lv:0}});
@@ -828,7 +879,7 @@ const sortInsts=a=>a.slice().sort((x,y)=>{const p=CARDS[x.d],q=CARDS[y.d];return
 const TAG={gust:'突風',quake:'揺れ',snipe:'狙い',suck:'吸引'};
 const ddChip=k=>`<span class="ddl dd-${k}">${DOODLES[k].g}</span>`;
 const trName=id=>TRINKETS[id].name+(TRINKETS[id].g?`<i class="gsrc">${TRINKETS[id].g}</i>`:'');
-const trText=id=>{const t=TRINKETS[id];return t.name+(t.g?`(元ネタ: ${t.g})`:'')+': '+t.desc;};
+const trText=id=>{const t=TRINKETS[id],st=trState(S.run,id);return t.name+(t.g?`(元ネタ: ${t.g})`:'')+': '+t.desc+(st?`(いま: ${st})`:'');};
 const roomOf=(ch,f)=>CHAPTERS[ch].rooms[f];
 const unlockedList=()=>UNLOCKS.filter(u=>meta.all||meta.total>=u.at);
 const troupeOpen=id=>id==='spade'||unlockedList().some(u=>u.kind==='troupe'&&u.id===id);
@@ -857,7 +908,8 @@ const HELP=`<ol class="help">
 <li><b>爆発</b>: 爆発する札は落ちると敵に15ダメージを与え、両隣と真上の札を吹き飛ばす。誘爆もする。</li>
 <li><b>崩す</b>: 塔の札をタップして「崩す」(手数1)。わざと崩して、塔ごと敵にぶつけられる。</li>
 <li><b>楼閣完成</b>: 10マスを埋めると全札がもう一度発動し、塔はそのまま敵の上に崩れ落ちる。</li>
-<li><b>落書き</b>: クレヨンの落書きは札の性質を変える。${ddChip('bomb')}爆弾 ${ddChip('wing')}浮遊 ${ddChip('crown')}倍率×2 ${ddChip('spring')}ばね ${ddChip('twin')}2回発動 ${ddChip('clone')}分身</li>
+<li><b>落書き</b>: クレヨンの落書きは札の性質を変える。${ddChip('bomb')}爆弾 ${ddChip('wing')}浮遊 ${ddChip('crown')}倍率×2 ${ddChip('spring')}ばね ${ddChip('twin')}2回発動 ${ddChip('clone')}分身 ${ddChip('sprout')}育つ</li>
+<li><b>調子と育つ札</b>: 「調子」は戦闘のあいだ続く強化で、札を置くたびに、その札の攻撃・守り・回復が調子の数だけ増える(段の倍率をかけたあとに足す。楼閣完成の再発動では増えない)。「芽」の落書きや成長期のジョーカーは、戦闘ごとに最初に置いたときに育ち、数値がずっと+1されていく(最大+8)。朝顔の鉢やカブトムシの幼虫のように、勝つほど育つガラクタもある。</li>
 <li><b>ボタン</b>: 戦闘やイベントで手に入る。店では札やガラクタを買えるほか、デッキの札を売ってボタンに換えられる。</li>
 <li><b>遊び道具</b>: ガラクタの中には、ポーカーの役、ブラックジャック、大富豪の革命、花札の役など、別のカードゲームのルールを持ち込むものがある。置けるマスに役の名前が出たら、そこに置くと発動する。一座を選ぶ画面の「ハチャメチャ箱」をオンにすると、最初から2つ持って出発できる。</li>
 <li><b>思い出</b>: 1回の挑戦が終わるたびにたまり、新しい一座・札・ガラクタが解放される。クリアすると次の大掃除レベルに挑める。</li>
@@ -869,11 +921,12 @@ function cardHTML(c,o){o=o||{};const su=SUIT[c.s];
  return`<span class="${cls}"><span class="cor"><span class="rk">${rk}</span><span class="st">${c.s==='J'||c.s==='X'?'':su.sym}</span></span>`+
   (o.mult?`<span class="mb">×${o.mult}</span>`:`<span class="cost${o.cost!=null&&o.cost<c.cost?' free':''}">${o.cost!=null?o.cost:c.cost}</span>`)+
   `<span class="pip">${c.s==='X'?(c.kw.spare?'予':'塵'):c.s==='J'?'★':su.sym}</span>`+
-  (c.dd?`<span class="dd dd-${c.dd}">${DOODLES[c.dd].g}</span>`:'')+
+  (c.dd?`<span class="dd dd-${c.dd}">${DOODLES[c.dd].g}${c.dd==='sprout'&&c.gr?`<i class="ddn">${c.gr}</i>`:''}</span>`:'')+
+  (c.kw.grow&&c.dd!=='sprout'?`<span class="dd dd-sprout${c.dd?' dd2':''}">育${c.gr?`<i class="ddn">${c.gr}</i>`:''}</span>`:'')+
   (o.big&&(c.name||c.up)?`<span class="nm">${label(c)}</span>`:'')+
   `<span class="fx">${lines.map(s=>`<span>${s}</span>`).join('')}</span></span>`;}
 function hudRun(){const r=S.run;return`<header class="hud panel"><div class="hpbox"><span class="lbl">HP</span><div class="bar"><i style="width:${r.hp/r.maxHp*100}%"></i></div><span class="num">${r.hp}/${r.maxHp}</span></div><span class="chip">ボタン ${r.btn}</span><button class="chip as-btn" data-act="deck">デッキ ${r.deck.length}</button></header>`+
- (r.tr.length?`<div class="trs">${r.tr.map(t=>`<button class="chip as-btn" data-act="tr" data-t="${t}">${TRINKETS[t].name}</button>`).join('')}</div>`:'');}
+ (r.tr.length?`<div class="trs">${r.tr.map(t=>{const st=trState(r,t);return`<button class="chip as-btn" data-act="tr" data-t="${t}">${TRINKETS[t].name}${st?` <b class="trst">${st}</b>`:''}</button>`;}).join('')}</div>`:'');}
 function vTitle(){const saved=store.get(KEY_RUN),nu=nextUnlock(),i=nu?UNLOCKS.indexOf(nu):-1,prev=i>0?UNLOCKS[i-1].at:0;
  let rows='';for(let t=3;t>=0;t--){let r='';for(let j=0;j<TL[t];j++){const k=TS[t]+j;r+=`<i class="cb${t===3?' top':''}${k===6?' tilt':''}" style="--i:${k}"></i>`;}rows+=`<div class="row">${r}</div>`;}
  const pct=nu?Math.max(0,Math.min(100,(meta.total-prev)/(nu.at-prev)*100)):100;
@@ -904,12 +957,12 @@ function vMap(){const run=S.run,fl=run.map.fl,av=availableNodes(run);const isAv=
  <div class="mapwrap"><div class="lbls">${lbl}</div><div class="lanes" style="height:${H}px"><svg viewBox="0 0 300 ${H}" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>${nodes}</div></div>
  <p class="legend">戦 戦闘・強 強敵・休 休憩・店 店・？ 出来事・宝 宝箱・主 ボス</p></section>
  <div class="piles"><button class="link" data-act="help">遊び方</button><button class="link" data-act="settings">設定</button><button class="link" data-act="home">タイトルへ</button></div>`;}
-function preview(run,c,k,m){const b=run.b,F=c.fx,tc=towerCount(b)+1,r=c.kw.twice?2:1;
+function preview(run,c,k,m){const b=run.b,F=c.fx,tc=towerCount(b)+1,r=c.kw.twice?2:1,p=b.cho||0,o=(tierOf(k)===0&&has(run,'ohajiki'))?1:0;
  if(c.kw.echo)return b.last?'再演':'空振り';
  if(F.flip){let s=0;for(let i=0;i<10;i++){if(b.tower[i]||i===k)s+=fallDmg(run,i)*3;if(b.tower[i]&&b.tower[i].c.kw.bomb)s+=boomVal(run);}return'落'+s;}
  if(F.mirror)return tierOf(k)>0?'映す':'空振り';if(F.multiply)return'増殖';if(F.shuffle)return'模様替';if(F.det)return'起爆';if(F.swap)return'入替';if(F.lull)return'半減';
- if(F.dmg)return'攻'+F.dmg*m*r;if(F.dmgT)return'攻'+F.dmgT*tc*m*r;if(F.grd)return'守'+F.grd*m*r;if(F.grdT)return'守'+F.grdT*tc*m*r;
- if(F.brc)return'補'+F.brc*m*r;if(F.heal)return'回'+F.heal*m*r;if(F.healT)return'回'+F.healT*tc*m*r;if(F.draw)return'引'+F.draw;return'';}
+ if(F.dmg)return'攻'+((F.dmg+o)*m+p)*r;if(F.dmgT)return'攻'+F.dmgT*tc*m*r;if(F.grd)return'守'+((F.grd+o)*m+p)*r;if(F.grdT)return'守'+F.grdT*tc*m*r;
+ if(F.brc)return'補'+F.brc*m*r;if(F.heal)return'回'+((F.heal+o)*m+p)*r;if(F.cho)return'調+'+F.cho;if(F.healT)return'回'+F.healT*tc*m*r;if(F.draw)return'引'+F.draw;return'';}
 function hint(run){const b=run.b;if(S.sel>=0&&b.hand[S.sel]){const c=cdata(b.hand[S.sel]),co=costOf(run,c);return`${label(c)}: ${desc(c)}(コスト${co}${co<c.cost?'・ストップウォッチで0':''}・ランク${c.r})。光ったマスに置ける。`;}
  if(!b.hand.length)return b.draw.length||b.disc.length?'手札を使い切った。「ターン終了」で次の札を引ける。':'引ける札が残っていない。塔の札をタップして「崩す」と、落ちた札は捨て札に回り、次のターンにまた引ける。';
  return b.turn===1&&!towerCount(b)?'まず1段目に札を置こう。落ちた札も敵に当たるので、崩されても無駄にはならない。':'札を選んで、光ったマスに積む。塔の札をタップすると「崩す」ができる。';}
@@ -930,7 +983,7 @@ function vBattle(){const run=S.run,b=run.b,e=b.en,E=ENEMIES[b.eid],pat=E.pat[e.s
  if(b.bet)ss.push(`<button class="chip as-btn" data-act="tinfo" data-t="bet">賭け ${b.bet}ボタン・${b.turn<=4?`あと${5-b.turn}ターン`:'没収'}</button>`);
  if(has(run,'hanafuda')){const n=Object.keys(b.hana).length;if(n)ss.push(`<button class="chip as-btn" data-act="tinfo" data-t="hana">花札の役 ${n}/${HANA.length}</button>`);}
  const st=[];if(b.weak)st.push(`<span class="chip grd">弱体 ${b.weak}</span>`);if(b.lull)st.push('<span class="chip grd">子守唄</span>');if(b.chill)st.push(`<span class="chip brc">かじかみ ${b.chill}</span>`);
- return`<header class="hud panel" id="hud"><div class="hpbox"><span class="lbl">HP</span><div class="bar"><i style="width:${b.hp/b.maxHp*100}%"></i></div><span class="num">${b.hp}/${b.maxHp}</span></div><span class="chip grd">守り ${b.grd}</span><span class="chip brc">補強 ${b.brc}</span></header>
+ return`<header class="hud panel" id="hud"><div class="hpbox"><span class="lbl">HP</span><div class="bar"><i style="width:${b.hp/b.maxHp*100}%"></i></div><span class="num">${b.hp}/${b.maxHp}</span></div><span class="chip grd">守り ${b.grd}</span><span class="chip brc">補強 ${b.brc}</span>${b.cho?`<span class="chip cho" id="cho">調子 +${b.cho}</span>`:''}</header>
  <section class="enemy panel" id="enemy"><div class="en-top"><b class="en-name">${E.name}${E.tier==='boss'?' <span class="chip brc">ボス</span>':E.tier==='elite'?' <span class="chip grd">強敵</span>':''}</b><span class="num">${fmt(e.hp)}/${fmt(e.max)}</span></div><div class="bar"><i style="width:${e.hp/e.max*100}%"></i></div>
  <div class="intents"><span class="it-l">次の行動</span>${pat.map(x=>`<span class="it it-${x.a}">${actLabel(x,e)}</span>`).join('')}${e.blk?`<span class="it it-block">防御中 ${e.blk}</span>`:''}${e.str?`<span class="it it-str">強化+${e.str}</span>`:''}${e.bag.length?`<span class="it it-bag">袋の中 ${e.bag.length}枚</span>`:''}</div>
  <p class="en-desc">${pat.map(x=>actDesc(x,e)).join('、')}。${inc.atk?`受けるダメージの見込み ${net}。`:''}</p></section>
@@ -942,7 +995,7 @@ function vBattle(){const run=S.run,b=run.b,e=b.en,E=ENEMIES[b.eid],pat=E.pat[e.s
  <div class="piles"><button class="link" data-act="pile" data-p="draw">山札 ${b.draw.length}</button><button class="link" data-act="pile" data-p="disc">捨て札 ${b.disc.length}</button><span class="fl">${run.ch}-${b.f} ${roomOf(run.ch,b.f)}</span><button class="link" data-act="help">遊び方</button></div>`;}
 const offerC=o=>cdata({d:o.d,up:0,dd:o.dd});
 function vReward(){const c=S.ctx;return`${hudRun()}<section class="panel scr"><p class="kicker">${c.boss?'ボスを倒した':'勝利'}</p><h2 class="h2">${c.ename}を退けた</h2>
- <p class="text">ボタンを${c.btn}枚手に入れた。${c.ok?`(あふれたダメージ${c.ok}を、招き猫がボタンに換えた)`:''}${c.heal?`鈴の音でHPが${c.heal}回復した。`:''}${c.bet?(c.bet.won?`チップの山: 4ターン以内に勝ったので、賭けた${c.bet.v}ボタンが${c.bet.v*2}ボタンになって戻った。`:`チップの山: 勝つのが遅れて、賭けた${c.bet.v}ボタンは没収された。`):''}${c.tr?`ガラクタ「${TRINKETS[c.tr].name}」も見つけた(${TRINKETS[c.tr].desc})。`:''}</p>
+ <p class="text">ボタンを${c.btn}枚手に入れた。${c.ok?`(あふれたダメージ${c.ok}を、招き猫がボタンに換えた)`:''}${c.heal?`鈴の音でHPが${c.heal}回復した。`:''}${c.bet?(c.bet.won?`チップの山: 4ターン以内に勝ったので、賭けた${c.bet.v}ボタンが${c.bet.v*2}ボタンになって戻った。`:`チップの山: 勝つのが遅れて、賭けた${c.bet.v}ボタンは没収された。`):''}${c.tr?`ガラクタ「${TRINKETS[c.tr].name}」も見つけた(${TRINKETS[c.tr].desc})。`:''}${c.grew&&c.grew.length?c.grew.join('。')+'。':''}</p>
  <p class="sub">札を1枚選んでデッキに加える。${c.boss?'ボスの報酬は珍しい札が多い。':'落書き付きの札もある。'}</p><div class="grid big">${c.cards.map((o,i)=>`<button class="hc" data-act="take" data-i="${i}" aria-label="${label(offerC(o))} ${desc(offerC(o))}">${cardHTML(offerC(o),{big:1})}</button>`).join('')}</div>
  <button class="btn wide" data-act="skip">見送る</button></section>`;}
 function vShop(){const c=S.ctx,run=S.run;return`${hudRun()}<section class="panel scr"><p class="kicker">${run.ch}-${run.floor}・おもちゃ箱のバザー</p><h2 class="h2">何を買う?</h2>${c.bonus?`<p class="sub">ブタの貯金箱からボタンが${c.bonus}枚出てきた。</p>`:''}
@@ -1004,11 +1057,14 @@ function dmgFloat(v){if(!v)return;float('enemy','-'+fmt(v)+(v>=100?'!':''),'d',0
 function onoma(id,word,dy){const r=rectOf(id);if(!r)return;const w=document.createElement('span');w.className='onoma';w.textContent=word;w.style.left=(r.left+r.width/2)+'px';w.style.top=(r.top+r.height/2+(dy||0))+'px';document.body.appendChild(w);setTimeout(()=>w.remove(),1000);}
 function boomAt(id,word){const r=rectOf(id);if(!r)return;const b=document.createElement('span');b.className='boomfx';b.style.left=(r.left+r.width/2)+'px';b.style.top=(r.top+r.height/2)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),650);onoma(id,word);SFX.play('boom');}
 function setMsg(t){S.msg=t;const m=document.getElementById('msg');if(m)m.textContent=t;}
+function turnMsg(fx){const p=[];for(const f of fx){if(f.by==='radio')p.push('ラジオ体操で調子+1');if(f.by==='mask')p.push('ヒーローのお面で調子+3');if(f.by==='nawatobi')p.push('なわとびの級表で守り+'+f.v);}return p.length?p.join('、')+'。':'';}
+function turnFloats(fx){const sh=sumFx(fx,'heal'),sc=sumFx(fx,'cho'),sg=sumFx(fx,'grd');if(sh)float('hud','+'+sh,'h',-60);if(sg)float('hud','守り+'+sg,'g',40);if(sc)float('hud','調子+'+sc,'c',150);}
 const sumFx=(fx,t)=>fx.filter(f=>f.t===t).reduce((s,f)=>s+f.v,0);
 const sumE=fx=>fx.filter(f=>f.t==='dmg'&&f.to==='e').reduce((s,f)=>s+f.v,0);
 const cnt=(fx,t)=>fx.filter(f=>f.t===t).length;
 function showFloats(ph){const d=sumE(ph),h=sumFx(ph,'heal'),g=sumFx(ph,'grd'),br=sumFx(ph,'brc');
- if(d)dmgFloat(d);if(h)float('hud','+'+h,'h',-60);if(g)float('hud','守り+'+g,'g',40);if(br)float('hud','補強+'+br,'b',110);}
+ if(d)dmgFloat(d);if(h)float('hud','+'+h,'h',-60);if(g)float('hud','守り+'+g,'g',40);if(br)float('hud','補強+'+br,'b',110);
+ const ch=sumFx(ph,'cho');if(ch)float('hud','調子+'+ch,'c',150);}
 function animateFalls(fx){let i=0,su=0;
  for(const f of fx){
   if(f.t==='fall'||f.t==='suck'){const el=document.getElementById('s'+f.k);if(el){el.style.animationDelay=(i*70)+'ms';el.classList.add(f.t==='suck'?'sucked':f.why==='flip'?'flying':'falling');}i++;if(f.t==='suck')su++;}
@@ -1022,6 +1078,7 @@ function placeMsg(fx){const p=fx[0],{pre,mid,post}=phaseSplit(fx),out=[];
  const d=sumE(pre),g=sumFx(pre,'grd'),br=sumFx(pre,'brc'),h=sumFx(pre,'heal'),bl=sumFx(pre,'blocked'),wk=sumFx(pre,'weak');
  if(d||bl)out.push(fmt(d)+'ダメージ'+(bl?`(防御で${bl}減)`:''));if(g)out.push('守り+'+g);if(br)out.push('補強+'+br);if(h)out.push('回復'+h);if(wk)out.push('弱体+'+wk);
  if(pre.some(f=>f.t==='lull'))out.push('このターン受けるダメージ半分');
+ const chp=sumFx(pre,'cho');if(chp)out.push('調子+'+chp);const gw=pre.find(f=>f.t==='grow');if(gw)out.push('育った(いま+'+gw.v+')');
  const cl=pre.filter(f=>f.t==='clone').reduce((s,f)=>s+f.n,0);if(cl)out.push('手札が'+cl+'枚増えた');
  if(pre.some(f=>f.t==='swap'))out.push('手札を入れ替えた');
  if(pre.some(f=>f.t==='mirror'))out.push('下の2枚を映した');if(pre.some(f=>f.t==='shuffle'))out.push('模様替えで全札が再発動');
@@ -1029,18 +1086,19 @@ function placeMsg(fx){const p=fx[0],{pre,mid,post}=phaseSplit(fx),out=[];
  if(p.free)out.push('ストップウォッチでコスト0');
  let s=`${label(p.c)}を${p.k===9?'天守':(tierOf(p.k)+1)+'段目'}へ(×${p.m}${p.parts.length?'・'+p.parts.join('・'):''})`+(out.length?':'+out.join('、'):'');
  const tp=pre.filter(f=>f.t==='trick');if(tp.length)s+='。'+tp.map(f=>f.n).join('!')+'!';
- if(mid.length){s+=`。楼閣完成!再発動で ${fmt(sumE(mid))}ダメージ`;const tm=mid.filter(f=>f.t==='trick');if(tm.length)s+=`(${tm.map(f=>f.n+(f.v?` +${f.v}`:'')).join('、')})`;const dd=mid.find(f=>f.t==='doodle');if(dd)s+=`。クレヨンで${dd.c}に「${DOODLES[dd.dd].n}」`;}
+ if(mid.length){s+=`。楼閣完成!再発動で ${fmt(sumE(mid))}ダメージ`;const tm=mid.filter(f=>f.t==='trick');if(tm.length)s+=`(${tm.map(f=>f.n+(f.v?` +${f.v}`:'')).join('、')})`;const dd=mid.find(f=>f.t==='doodle');if(dd)s+=`。クレヨンで${dd.c}に「${DOODLES[dd.dd].n}」`;const cm=sumFx(mid,'cho');if(cm)s+=`。背比べの柱で調子+${cm}`;const nm=mid.find(f=>f.t==='msg');if(nm)s+='。'+nm.s;}
  const flip=fx.some(f=>f.t==='flip'),det=fx.some(f=>f.t==='det');if(flip)s+='。ちゃぶ台返し!';if(det)s+='。起爆!';
  if(post.length){const n=cnt(post,'fall'),bm=cnt(post,'boom');s+=`${mid.length?'、':(flip||det)?'':'。'}${n}枚が崩れ落ちて ${fmt(sumE(post))}ダメージ`+(bm?`(爆発${bm}回)`:'');}
  return s;}
 function demoMsg(fx,X){const n=cnt(fx,'fall'),bm=cnt(fx,'boom'),sp=cnt(fx,'spring');
  return`${label(X.c)}を${fx.some(f=>f.t==='trick')?'メンコで叩きつけて':''}崩した。${n}枚が落ちて ${fmt(sumE(fx))}ダメージ`+(bm?`(爆発${bm}回)`:'')+(sp?`。${sp}枚がばねで手札に戻った`:'')+'。';}
 function enemyMsg(fx){const p=[],d=fx.filter(f=>f.t==='dmg'&&f.to==='p');
+ const bt=fx.find(f=>f.t==='beetle');if(bt)p.push('カブトムシがツノで突いて'+bt.v+'ダメージ');
  if(d.length){const v=d.reduce((s,f)=>s+f.v,0),bl=d.reduce((s,f)=>s+f.blocked,0);p.push(v+'ダメージを受けた'+(bl?`(守りで${bl}防いだ)`:''));}
  const sp=fx.find(f=>f.t==='spit');if(sp)p.push('吸い込まれた札'+sp.n+'枚が飛んできた');
  const su=cnt(fx,'suck');if(su)p.push('札が'+su+'枚吸い込まれた');
  if(fx.some(f=>f.t==='scramble'))p.push('塔の札がかき回された');
- const fl=cnt(fx,'fall'),ed=sumE(fx);if(fl)p.push('札が'+fl+'枚落ちた'+(ed?`。落ちた札が敵に当たって${fmt(ed)}ダメージ`:''));else if(ed)p.push('敵に'+fmt(ed)+'ダメージ');
+ const fl=cnt(fx,'fall'),ed=fx.filter(f=>f.t==='dmg'&&f.to==='e'&&f.src!=='kabuto').reduce((s,f)=>s+f.v,0);if(fl)p.push('札が'+fl+'枚落ちた'+(ed?`。落ちた札が敵に当たって${fmt(ed)}ダメージ`:''));else if(ed)p.push('敵に'+fmt(ed)+'ダメージ');
  const bm=fx.filter(f=>f.t==='boom');if(bm.some(b=>b.inside))p.push('吸い込まれた爆弾が中で爆発した');else if(bm.length)p.push('爆発'+bm.length+'回');
  const sv=fx.filter(f=>f.t==='save'),sb=sv.filter(s=>s.by==='brace').length;
  if(sb)p.push('補強で'+sb+'回防いだ');if(sv.some(s=>s.by==='tape'))p.push('テープで1回防いだ');if(sv.some(s=>s.by==='steady'))p.push('不動の札は動かない');
@@ -1059,8 +1117,8 @@ function openRelics(title,sub,ids,cb){S.ov={mode:'relics',title,sub,ids,cb};rend
 function openView(title,insts){S.ov={mode:'view',title,pick:0,cards:sortInsts(insts).map(x=>({u:x.u,c:cdata(x)}))};render();}
 function startRun(seed,o,msg){S.run=newRun(seed,o);S.ov=null;S.sel=-1;S.focus=-1;S.end=null;toMap(msg);}
 function enterNode(f,i){const run=S.run,n=run.map.fl[f][i];run.floor=f;run.node=i;n.done=1;S.msg='';S.sel=-1;S.focus=-1;window.scrollTo(0,0);
- if(n.t==='battle'||n.t==='elite'||n.t==='boss'){const eid=pickEnemy(run,n.t,f),b=startBattle(run,eid,f);startTurn(run);see('e',[eid]);S.scr='battle';
-  S.msg=ENEMIES[eid].say+(b.spare?` デッキが${MIN_DECK}枚に足りないので、この戦闘だけ予備の札を${b.spare}枚足した。`:'')+(b.tarot?` タロットは「${TAROT[b.tarot].n}」: ${TAROT[b.tarot].d}。`:'')+(b.trump?` 切り札は${SUIT[b.trump].sym}。`:'')+(b.bet?` ${b.bet}ボタンを賭けた。`:'');S.deal=1;render();S.deal=0;
+ if(n.t==='battle'||n.t==='elite'||n.t==='boss'){const eid=pickEnemy(run,n.t,f),b=startBattle(run,eid,f),sfx=startTurn(run);see('e',[eid]);S.scr='battle';
+  S.msg=ENEMIES[eid].say+(b.spare?` デッキが${MIN_DECK}枚に足りないので、この戦闘だけ予備の札を${b.spare}枚足した。`:'')+(b.tarot?` タロットは「${TAROT[b.tarot].n}」: ${TAROT[b.tarot].d}。`:'')+(b.trump?` 切り札は${SUIT[b.trump].sym}。`:'')+(b.bet?` ${b.bet}ボタンを賭けた。`:'')+(b.asa?` 朝顔の鉢で調子+${b.asa}。`:'')+(turnMsg(sfx)?' '+turnMsg(sfx):'');S.deal=1;render();S.deal=0;
   if(n.t==='boss')banner(run.ch===3?'最終戦':'第'+run.ch+'章 ボス');if(!store.get(KEY_TUT)){store.set(KEY_TUT,1);S.ov={mode:'help'};render();}return;}
  if(n.t==='rest')S.scr='rest';
  else if(n.t==='shop'){S.ctx=genShop(run);see('c',S.ctx.cards.map(x=>x.d));see('r',S.ctx.trs.map(x=>x.id));S.scr='shop';if(S.ctx.bonus)SFX.play('coin');}
@@ -1094,8 +1152,8 @@ async function doEndTurn(){const run=S.run,b=run.b;S.busy=true;S.sel=-1;S.focus=
  setMsg(enemyMsg(fx));await wait(n?700+Math.min(n,10)*60:480);
  if(b.over==='lose'){render();await wait(500);endRun(false);S.scr='over';S.busy=false;render();window.scrollTo(0,0);return;}
  if(b.over==='win'){render();return winBattle();}
- const sfx=startTurn(run);S.deal=1;render();S.deal=0;S.busy=false;
- const sh=sumFx(sfx,'heal');if(sh)float('hud','+'+sh,'h',-60);}
+ const sfx=startTurn(run),tm=turnMsg(sfx);if(tm)S.msg=(S.msg?S.msg+' ':'')+tm;S.deal=1;render();S.deal=0;S.busy=false;
+ turnFloats(sfx);}
 async function winBattle(){S.busy=true;const run=S.run,b=run.b,E=ENEMIES[b.eid];SFX.play('win');banner(E.tier==='boss'?(run.ch===3?'掃除機を止めた!':E.name+'を倒した!'):'勝利');await wait(950);
  if(E.tier==='boss'&&run.ch===3){run.hp=b.hp;run.b=null;run.won=1;run.kills++;run.bosses++;endRun(true);S.scr='win';S.busy=false;render();window.scrollTo(0,0);return;}
  const rw=finishBattle(run);see('c',rw.cards.map(o=>o.d));if(rw.tr)see('r',[rw.tr]);S.ctx=Object.assign({ename:E.name},rw);S.scr='reward';S.busy=false;render();window.scrollTo(0,0);}
@@ -1144,17 +1202,19 @@ const ACT={
  buy(d){const c=S.ctx,x=c.cards[+d.i],run=S.run;if(run.btn<x.p)return toast('ボタンが足りない');run.btn-=x.p;x.sold=1;addCard(run,x.d,0,x.dd);SFX.play('coin');render();toast(label(offerC(x))+'を買った');},
  buytr(d){const c=S.ctx,x=c.trs[+d.i],run=S.run;if(run.btn<x.p)return toast('ボタンが足りない');run.btn-=x.p;x.sold=1;run.tr.push(x.id);SFX.play('coin');render();toast(TRINKETS[x.id].name+'を買った');},
  ddsvc(){const c=S.ctx,run=S.run;if(run.btn<c.ddP)return toast('ボタンが足りない');const cand=run.deck.filter(canDoodle);if(!cand.length)return toast('落書きできる札がない');
-  openPick('落書きしてもらう札を選ぶ','「'+DOODLES[c.dd].n+'」: '+DOODLES[c.dd].d+'。',cand,x=>({u:x.u,d:x.d,up:x.up,dd:c.dd}),u=>{if(doodleCard(run,u,c.dd)){run.btn-=c.ddP;c.ddUsed=1;toast('「'+DOODLES[c.dd].n+'」の落書きを描いてもらった');}});},
+  openPick('落書きしてもらう札を選ぶ','「'+DOODLES[c.dd].n+'」: '+DOODLES[c.dd].d+'。',cand,x=>({u:x.u,d:x.d,up:x.up,dd:c.dd,gr:x.gr}),u=>{if(doodleCard(run,u,c.dd)){run.btn-=c.ddP;c.ddUsed=1;toast('「'+DOODLES[c.dd].n+'」の落書きを描いてもらった');}});},
  sellsvc(){const c=S.ctx,run=S.run;if(run.deck.length<=MIN_DECK)return toast(`デッキは${MIN_DECK}枚より減らせない`);
   openPick('売る札を選ぶ',`札の下に買い取り値を表示している。売ったあとも店に残れる(デッキは${MIN_DECK}枚まで)。`,run.deck,null,u=>{const x=run.deck.find(q=>q.u===u),nm=x?label(cdata(x)):'',p=sellCard(run,u);if(p<0)return toast(`デッキは${MIN_DECK}枚より減らせない`);c.soldN++;c.earned+=p;SFX.play('coin');toast(`${nm}を${p}ボタンで売った`);},x=>'+'+sellPrice(x)+'ボタン');},
  rest(){const run=S.run,h=restHeal(run);run.hp+=h;toMap('HPが'+h+'回復した');},
- iron(){const run=S.run;openPick('アイロンをかける札を選ぶ','強化したあとの効果を表示している。',run.deck.filter(canUpgrade),x=>({u:x.u,d:x.d,up:1,dd:x.dd}),u=>{upgradeCard(run,u);const x=run.deck.find(q=>q.u===u);toMap(label(cdata(x))+'になった');});},
+ iron(){const run=S.run;openPick('アイロンをかける札を選ぶ','強化したあとの効果を表示している。',run.deck.filter(canUpgrade),x=>({u:x.u,d:x.d,up:1,dd:x.dd,gr:x.gr}),u=>{upgradeCard(run,u);const x=run.deck.find(q=>q.u===u);toMap(label(cdata(x))+'になった');});},
  choose(d){const c=S.ctx,ev=EVENTS.find(x=>x.id===c.id),ch=ev.ch[+d.i],run=S.run;
   if(ch.pickUp){const ups=run.deck.filter(canUpgrade);if(!ups.length){c.res='乾かす札がなかった。';return render();}
-   return openPick('乾かす札を選ぶ','強化したあとの効果を表示している。',ups,x=>({u:x.u,d:x.d,up:1,dd:x.dd}),u=>{upgradeCard(run,u);const x=run.deck.find(q=>q.u===u);c.res=label(cdata(x))+'になった。';});}
+   return openPick('乾かす札を選ぶ','強化したあとの効果を表示している。',ups,x=>({u:x.u,d:x.d,up:1,dd:x.dd,gr:x.gr}),u=>{upgradeCard(run,u);const x=run.deck.find(q=>q.u===u);c.res=label(cdata(x))+'になった。';});}
   if(ch.pickRemove)return openPick('置いていく札を選ぶ','選んだ札はデッキから消える。',run.deck,null,u=>{c.res=removeCard(run,u)?'札を1枚置いていった。少し身軽になった。':`デッキは${MIN_DECK}枚より減らせない。`;});
   if(ch.pickDoodle){const cand=run.deck.filter(canDoodle);if(!cand.length){c.res='描ける札がなかった。';return render();}
-   return openPick('落書きしてもらう札を選ぶ','「'+DOODLES[c.dd].n+'」: '+DOODLES[c.dd].d+'。',cand,x=>({u:x.u,d:x.d,up:x.up,dd:c.dd}),u=>{doodleCard(run,u,c.dd);const x=run.deck.find(q=>q.u===u);c.res=label(cdata(x))+'に「'+DOODLES[c.dd].n+'」の落書きが付いた。';});}
+   return openPick('落書きしてもらう札を選ぶ','「'+DOODLES[c.dd].n+'」: '+DOODLES[c.dd].d+'。',cand,x=>({u:x.u,d:x.d,up:x.up,dd:c.dd,gr:x.gr}),u=>{doodleCard(run,u,c.dd);const x=run.deck.find(q=>q.u===u);c.res=label(cdata(x))+'に「'+DOODLES[c.dd].n+'」の落書きが付いた。';});}
+  if(ch.pickSprout){const cand=run.deck.filter(canDoodle);if(!cand.length){c.res='種をまける札がなかった(落書きのない札が要る)。';return render();}
+   return openPick('種をまく札を選ぶ','「芽」: '+DOODLES.sprout.d+'。落書きのない札にだけまける。',cand,x=>({u:x.u,d:x.d,up:x.up,dd:'sprout',gr:x.gr}),u=>{doodleCard(run,u,'sprout');const x=run.deck.find(q=>q.u===u);c.res=label(cdata(x))+'に芽が出た。使うほど育っていく。';});}
   if(ch.pickMicro)return openPick('チンする札を選ぶ','半々で、強化と王冠の落書き。外れると黒焦げで消える。',run.deck.filter(x=>CARDS[x.d].rar!=='x'),null,u=>{c.res=microwave(run,u);});
   if(ch.pickDup)return openPick('複製する札を選ぶ','同じ札がもう1枚デッキに入る(強化と落書きもそのまま)。HP-6。',run.deck.filter(x=>CARDS[x.d].rar!=='x'),null,u=>{const x=run.deck.find(q=>q.u===u);c.res=dupCard(run,u)?label(cdata(x))+'が鏡から出てきた。':'複製できなかった。';});
   if(ch.pickSell2){if(run.deck.length<=MIN_DECK){c.res=`デッキが${MIN_DECK}枚しかないので、売れる札がなかった。`;return render();}
