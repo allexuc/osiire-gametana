@@ -42,3 +42,12 @@
 - 分割した開発用ソースはない。`satsujo/index.html` が本体なので、そのまま直す。版は `const VERSION='…'`
 - 設計書は Claude Docs: https://claude.ai/artifact/BFKJPzxHsmX7SQBr6WA4sy 。ルールや数値を変えたら設計書も直す
 - 楼閣は10マス。デッキの下限 `MIN_DECK` は10(下回ると楼閣が完成できず詰む)
+
+## 一線打尽(amida/)
+
+- いまは下書き(game.json の status が draft、v0.1.0)。棚に並べるときは status を public にし、version と `const VERSION='…'` を上げて build
+- 分割した開発用ソースはない。`amida/index.html` が本体(ルールの計算は `// ==ENGINE START==` から `// ==ENGINE END==`、画面はそのあとの script)
+- 設計書は Claude Docs: https://claude.ai/artifact/F3UVhoQWdPT3Cab3kVJ4CC 。ルールや数値を変えたら設計書も直す
+- 盤は縦線5本・7段。同じ段で縦線を共有する横線は置けない(`canPut`)。横線1本で入れ替わるのは、その高さで隣り合う2つの駒の行き先だけ
+- 敵の予告のうち横槍・消しゴム・移動などはターンの終わりに起き、場所はターンの始めに決める(`revealIntents`)。画面の見込みは `clash` をそのまま使う(b を書き換えない)
+- シミュレーター: `cd amida && node tools/sim.js index.html 300`。`BOT=normal`(数か所だけ試すボット)、`STICKERS=all`、`PENS=hl,red`、`LINEUP=sumo,sumo,…`、`NODRAW=1`、`FILL=1`(盤を埋めて書けないとき)、`TUNE="章:HP倍率,攻撃倍率"`
