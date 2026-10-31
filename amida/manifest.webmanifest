@@ -1,0 +1,35 @@
+{
+  "name": "一線打尽",
+  "short_name": "一線打尽",
+  "description": "ノートに描いたあみだくじで、落書きの駒と文房具の付喪神が合戦するローグライク。横線を書き足して、だれがだれとぶつかるかを決めよう。放課後の教室から夜の校舎の七不思議まで、全3章。",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fbfbf6",
+  "theme_color": "#2456b8",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

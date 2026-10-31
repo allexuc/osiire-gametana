@@ -1,0 +1,20 @@
+{
+  "id": "amida",
+  "title": "一線打尽",
+  "kana": "いっせんだじん",
+  "catch": "当たるも外れるも、線しだい。",
+  "description": "ノートに描いたあみだくじで、落書きの駒と文房具の付喪神が合戦するローグライク。横線を書き足して、だれがだれとぶつかるかを決めよう。放課後の教室から夜の校舎の七不思議まで、全3章。",
+  "genre": "あみだくじローグライク",
+  "playtime": "15〜20分（途中で中断できます）",
+  "controls": "タップだけ",
+  "status": "draft",
+  "version": "0.1.0",
+  "added": "2026-10-31",
+  "order": 2,
+  "theme_color": "#2456b8",
+  "background_color": "#fbfbf6",
+  "orientation": "portrait",
+  "og_image": "og.png",
+  "cover": "og.png",
+  "offline": true
+}

@@ -1,0 +1,1245 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>一線打尽</title>
+<meta name="description" content="ノートに描いたあみだくじで、落書きの駒と文房具の付喪神が合戦するローグライク。横線を書き足して、だれがだれとぶつかるかを決めよう。放課後の教室から夜の校舎まで、全3章。">
+<meta name="theme-color" content="#2456b8">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:title" content="一線打尽">
+<meta property="og:description" content="ノートに描いたあみだくじで、落書きの駒と文房具の付喪神が合戦するローグライク。横線を書き足して、だれがだれとぶつかるかを決めよう。">
+<meta property="og:image" content="https://allexuc.github.io/osiire-gametana/amida/og.png">
+<meta property="og:url" content="https://allexuc.github.io/osiire-gametana/amida/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="一線打尽">
+<meta name="twitter:description" content="ノートに描いたあみだくじで、落書きの駒と文房具の付喪神が合戦するローグライク。">
+<meta name="twitter:image" content="https://allexuc.github.io/osiire-gametana/amida/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* 一線打尽: ライトは大学ノート(白い紙に水色の罫線、赤青鉛筆)、ダークは黒板(深緑にチョーク) */
+:root{
+  --paper:#fbfbf6;--paper-2:#f0f3f5;--rule:#d5e4ef;--margin:#f0b7b2;
+  --ink:#1f232b;--ink-2:#575e6b;--ink-3:#8a909a;
+  --graphite:#5f6570;--print:#262a31;
+  --blue:#2456b8;--blue-ink:#ffffff;--blue-soft:rgba(36,86,184,.11);
+  --red:#cc392e;--red-soft:rgba(204,57,46,.11);
+  --hl:#ffe04a;--hl-wash:rgba(255,222,58,.6);
+  --good:#1b8550;--gold:#a8770a;
+  --card:#ffffff;--edge:#cdd5de;--shade:rgba(31,35,43,.09);
+  --p0:#2f6fd6;--p1:#1d9658;--p2:#df7612;--p3:#8a4fd0;--p4:#d23f7b;
+  --f-hand:"Klee One","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;
+  --f-ui:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;
+  --gut:max(16px,env(safe-area-inset-left,0px));--gut-r:max(16px,env(safe-area-inset-right,0px));
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#1c3a30;--paper-2:#21453a;--rule:rgba(236,242,230,.055);--margin:rgba(244,160,146,.3);
+  --ink:#eef2e9;--ink-2:#bccabc;--ink-3:#8ea294;--graphite:#d6ddd1;--print:#f5f7f0;
+  --blue:#9ccaf7;--blue-ink:#0f2a20;--blue-soft:rgba(156,202,247,.15);
+  --red:#f6a596;--red-soft:rgba(246,165,150,.15);--hl:#f3d85e;--hl-wash:rgba(243,216,94,.32);
+  --good:#93deb0;--gold:#f0cf6b;--card:#244a3e;--edge:#3f6a5a;--shade:rgba(0,0,0,.22);
+  --p0:#8cbdf7;--p1:#8ddcab;--p2:#f6b56f;--p3:#c7a6f4;--p4:#f4a0c2;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#1c3a30;--paper-2:#21453a;--rule:rgba(236,242,230,.055);--margin:rgba(244,160,146,.3);
+  --ink:#eef2e9;--ink-2:#bccabc;--ink-3:#8ea294;--graphite:#d6ddd1;--print:#f5f7f0;
+  --blue:#9ccaf7;--blue-ink:#0f2a20;--blue-soft:rgba(156,202,247,.15);
+  --red:#f6a596;--red-soft:rgba(246,165,150,.15);--hl:#f3d85e;--hl-wash:rgba(243,216,94,.32);
+  --good:#93deb0;--gold:#f0cf6b;--card:#244a3e;--edge:#3f6a5a;--shade:rgba(0,0,0,.22);
+  --p0:#8cbdf7;--p1:#8ddcab;--p2:#f6b56f;--p3:#c7a6f4;--p4:#f4a0c2;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background-color:var(--paper);color:var(--ink);font:15px/1.65 var(--f-ui);-webkit-text-size-adjust:100%;
+  background-image:linear-gradient(90deg,transparent 0 calc(var(--gut) - 6px),var(--margin) calc(var(--gut) - 6px) calc(var(--gut) - 5px),transparent calc(var(--gut) - 5px)),repeating-linear-gradient(180deg,transparent 0 31px,var(--rule) 31px 32px);
+  -webkit-tap-highlight-color:transparent}
+#app{max-width:460px;margin:0 auto;min-height:100vh;min-height:100svh;padding-left:var(--gut);padding-right:var(--gut-r);padding-block:max(10px,env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-bottom,0px));display:flex;flex-direction:column}
+button{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--f-hand);font-weight:600;margin:0;line-height:1.3}
+p{margin:0}
+.btn{appearance:none;border:2px solid var(--ink);background:var(--card);color:var(--ink);border-radius:10px;padding:9px 16px;min-height:46px;font-weight:700;cursor:pointer;letter-spacing:.02em;touch-action:manipulation}
+.btn:active{transform:translateY(1px)}
+.btn.go{background:var(--blue);border-color:var(--blue);color:var(--blue-ink);font-family:var(--f-hand);font-weight:600;font-size:19px}
+.btn.quiet{border-color:var(--edge);font-weight:500}
+.btn:disabled{opacity:.38;cursor:default;transform:none}
+.btn.wide{width:100%}
+.link{appearance:none;border:0;background:none;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px;padding:8px 4px;cursor:pointer;font-size:14px}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
+.art{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;display:block}
+.art .dot{fill:currentColor;stroke:none}.art .fillink{fill:currentColor}.art .fillred{fill:var(--red);stroke:var(--red)}.art .redline{stroke:var(--red)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* 上の帯 */
+.hud{display:flex;align-items:center;gap:10px;min-height:44px}
+.hp{flex:1;display:flex;align-items:center;gap:8px;min-width:0;font-family:var(--f-hand);font-weight:600}
+.hp b{font-size:17px;white-space:nowrap}
+.hpbar{flex:1;height:10px;border:1.5px solid var(--ink);border-radius:6px;overflow:hidden;position:relative;min-width:48px;background:var(--card)}
+.hpbar i{position:absolute;inset:0 auto 0 0;background:repeating-linear-gradient(115deg,var(--red) 0 3px,transparent 3px 5px);transition:width .45s}
+.yen{font-family:var(--f-hand);font-weight:600;white-space:nowrap}
+.icon-btn{appearance:none;border:1.5px solid var(--edge);background:var(--card);border-radius:10px;width:40px;height:40px;display:grid;place-items:center;cursor:pointer;padding:0}
+.icon-btn svg{width:22px;height:22px}
+.where{font-size:12.5px;color:var(--ink-2);display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:22px}
+.seals{display:flex;gap:4px;flex-wrap:wrap}
+.seal{appearance:none;border:1.5px solid var(--edge);background:var(--card);border-radius:999px;font-size:11.5px;padding:1px 8px;cursor:pointer;color:var(--ink);line-height:1.6}
+
+/* 戦闘 */
+.battle{display:flex;flex-direction:column;flex:1;gap:4px}
+.row5{display:grid;grid-template-columns:repeat(5,1fr);gap:0;position:relative}
+.piece{appearance:none;background:none;border:0;padding:0 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;position:relative;color:var(--ink)}
+.tag{width:100%;max-width:68px;border:1.5px solid var(--edge);border-radius:8px;background:var(--card);padding:3px 2px 4px;display:flex;flex-direction:column;align-items:center;position:relative;box-shadow:0 1px 0 var(--shade)}
+.tag::before{content:"";position:absolute;left:6px;right:6px;top:-1.5px;height:4px;border-radius:0 0 3px 3px;background:var(--pc)}
+.tag .art{width:30px;height:30px;color:var(--ink)}
+.tag .nm{font-family:var(--f-hand);font-weight:600;font-size:12px;line-height:1.25;white-space:nowrap}
+.tag .st{font-size:11.5px;line-height:1.3;white-space:nowrap;font-weight:700}
+.st .a{color:var(--blue)}.st .d{color:var(--ink-2)}
+.st .up{background:var(--hl-wash);border-radius:3px;padding:0 2px}
+.piece.sel .tag{border-color:var(--pc);box-shadow:0 0 0 2px var(--pc)}
+.piece .badge{position:absolute;top:-6px;right:0;font-size:10.5px;font-weight:700;background:var(--ink);color:var(--paper);border-radius:6px;padding:0 4px;line-height:1.5}
+.piece .lv{position:absolute;top:2px;left:4px;font-size:10px;font-weight:700;color:var(--gold)}
+.piece .hurt{font-size:11.5px;font-weight:700;line-height:1.4;min-height:16px;color:var(--red)}
+.piece .hurt.ok{color:var(--good)}
+.board{position:relative;margin:0 -2px}
+.board svg{display:block;width:100%;height:auto;overflow:visible}
+.gap{fill:transparent;cursor:pointer}
+.gap:hover{fill:var(--blue-soft)}
+.post{stroke:var(--ink-3);stroke-width:2;stroke-linecap:round}
+.rung{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.rung.ink{stroke:var(--print);stroke-width:3.4}
+.rung.pencil{stroke:var(--graphite);stroke-width:3}
+.rung.enemy{stroke:var(--red);stroke-width:3}
+.rung.ball{stroke:var(--blue);stroke-width:2.4}
+.rung.brush{stroke:var(--print);stroke-width:6}
+.rung.red{stroke:var(--red);stroke-width:3;stroke-dasharray:7 4}
+.rung.ruler{stroke:var(--graphite);stroke-width:3}
+.wash{fill:none;stroke:var(--hl-wash);stroke-width:13;stroke-linecap:round}
+.new-rung{animation:pop .35s ease-out}
+@keyframes pop{from{opacity:.2}to{opacity:1}}
+.ghost{fill:none;stroke:var(--red);stroke-width:2.4;stroke-dasharray:4 5;stroke-linecap:round;opacity:.9}
+.xmark{stroke:var(--red);stroke-width:2.6;stroke-linecap:round}
+.staple-mark{stroke:var(--print);stroke-width:2;fill:none}
+.trail{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:.55}
+.trail.on{stroke-width:5;opacity:.95}
+.fx-path{fill:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.foe{appearance:none;background:none;border:0;padding:0 2px;cursor:pointer;color:var(--ink);display:flex;flex-direction:column;align-items:center;position:relative;min-height:100px}
+.foe .card{width:100%;border:1.5px dashed var(--edge);border-radius:8px;padding:2px 2px 4px;display:flex;flex-direction:column;align-items:center;background:color-mix(in srgb,var(--card) 70%,transparent);position:relative}
+.foe.on .card{border-style:solid;background:var(--card);box-shadow:0 1px 0 var(--shade)}
+.foe .art{width:32px;height:32px}
+.foe .nm{font-family:var(--f-hand);font-weight:600;font-size:11.5px;line-height:1.2;text-align:center;min-height:14px;overflow:hidden;max-width:100%;white-space:nowrap;text-overflow:ellipsis}
+.ehp{width:86%;height:6px;border:1.2px solid var(--ink);border-radius:4px;position:relative;overflow:hidden;margin:2px 0}
+.ehp i{position:absolute;inset:0 auto 0 0;background:var(--ink);transition:width .4s}
+.ehp s{position:absolute;inset:0 auto 0 0;background:repeating-linear-gradient(115deg,var(--blue) 0 2px,transparent 2px 4px);opacity:.9}
+.hpn{font-size:10.5px;color:var(--ink-2);line-height:1.2}
+.intent{font-size:12px;font-weight:700;line-height:1.35;border-radius:6px;padding:0 5px;margin-top:2px;white-space:nowrap}
+.intent.atk{color:var(--red);background:var(--red-soft)}
+.intent.etc{color:var(--ink);background:var(--paper-2)}
+.intent.def{color:var(--blue);background:var(--blue-soft)}
+.foe .arrive{display:flex;align-items:center;gap:3px;font-size:11px;font-weight:700;line-height:1.3;min-height:18px;margin-top:1px}
+.foe .arrive i{width:9px;height:9px;border-radius:50%;background:var(--pc);display:inline-block}
+.foe .pred{position:absolute;top:-4px;right:2px;font-size:12px;font-weight:700;color:var(--blue);background:var(--card);border-radius:6px;padding:0 3px;line-height:1.35;box-shadow:0 0 0 1px var(--edge)}
+.foe .pred.kill{color:#fff;background:var(--blue)}
+.foe.dead{opacity:.35}
+.foe.wide{grid-column:span 2}
+.empty-slot{font-size:11px;color:var(--ink-3);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:18px;min-height:100px}
+.empty-slot .arrive{display:flex;align-items:center;gap:3px;font-weight:700;color:var(--ink-2)}
+.empty-slot .arrive i{width:9px;height:9px;border-radius:50%;background:var(--pc);display:inline-block}
+.sum{display:flex;gap:6px;flex-wrap:wrap;align-items:center;min-height:26px;font-size:12.5px}
+.sum span{border-radius:6px;padding:1px 7px;font-weight:700;background:var(--paper-2)}
+.sum .give{color:var(--blue)}.sum .take{color:var(--red)}.sum .heal{color:var(--good)}
+.msg{font-size:13px;color:var(--ink-2);min-height:22px;line-height:1.5}
+.msg b{color:var(--ink)}
+.dock{position:sticky;bottom:0;padding-top:6px;padding-bottom:4px;background:linear-gradient(180deg,transparent,var(--paper) 14px);margin-top:auto}
+.pens{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.pen{appearance:none;border:1.5px solid var(--edge);background:var(--card);border-radius:10px;display:flex;align-items:center;gap:4px;padding:3px 9px 3px 5px;min-height:36px;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--ink)}
+.pen .art{width:22px;height:22px;stroke-width:3}
+.pen.on{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue);color:var(--blue)}
+.pen:disabled{opacity:.4;cursor:default}
+.pen em{font-style:normal;font-weight:500;color:var(--ink-2)}
+.actions{display:flex;gap:8px;align-items:center}
+.strokes{display:flex;align-items:center;gap:2px;font-family:var(--f-hand);font-weight:600;font-size:13px;white-space:nowrap}
+.strokes .art{width:24px;height:24px;stroke-width:3}
+.strokes .used{opacity:.22}
+.actions .go{flex:1}
+.hint{border:2px solid var(--ink);background:var(--card);border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.6;margin:4px 0;display:flex;gap:10px;align-items:flex-start}
+.hint p{flex:1}
+.hint .btn{min-height:36px;padding:4px 12px}
+.pop{position:absolute;font-family:var(--f-hand);font-weight:600;font-size:20px;pointer-events:none;z-index:5;transform:translate(-50%,-50%);text-shadow:0 0 3px var(--paper),0 0 6px var(--paper)}
+.pop.dmg{color:var(--blue)}.pop.hurt{color:var(--red)}.pop.heal{color:var(--good)}.pop.info{color:var(--ink);font-size:15px}
+.shake{animation:shake .32s}
+@keyframes shake{25%{transform:translateX(-4px)}50%{transform:translateX(3px)}75%{transform:translateX(-2px)}}
+
+/* 道中 */
+.chap{font-family:var(--f-hand);font-weight:600;font-size:20px}
+.lineup{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:6px 0 2px}
+.lineup .piece .tag{max-width:none}
+.route svg{display:block;width:100%;height:auto}
+.node{cursor:default}
+.node circle{fill:var(--card);stroke:var(--edge);stroke-width:1.6}
+.node text{font-family:var(--f-hand);font-weight:600;font-size:15px;fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+.node.elite circle{stroke:var(--red);stroke-width:2.2}
+.node.elite text{fill:var(--red)}
+.node.on circle{stroke:var(--blue);stroke-width:3}
+.node.done circle{fill:var(--paper-2);stroke:var(--ink-3)}
+.node.done text{fill:var(--ink-3)}
+.node.here circle{fill:var(--blue);stroke:var(--blue)}
+.node.here text{fill:var(--blue-ink)}
+.route .post{stroke-width:2;stroke:var(--print)}
+.route .way{fill:none;stroke:var(--blue);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;opacity:.55}
+.route .rr{stroke:var(--print);stroke-width:2.6;stroke-linecap:round}
+.route .rr.me{stroke:var(--blue)}
+.start{cursor:pointer}
+.start rect{fill:transparent}
+.start path{fill:var(--ink-3)}
+.start.on path{fill:var(--blue)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--ink-2);margin:4px 0}
+.legend b{font-family:var(--f-hand);color:var(--ink);margin-right:3px}
+.next-card{border:2px solid var(--ink);border-radius:12px;background:var(--card);padding:10px 12px;margin:6px 0;display:flex;gap:10px;align-items:center}
+.next-card .stamp{width:44px;height:44px;border-radius:50%;border:2px solid currentColor;display:grid;place-items:center;font-family:var(--f-hand);font-weight:600;font-size:22px;flex:none}
+.next-card p{font-size:13px;color:var(--ink-2)}
+.next-card h3{font-size:17px}
+
+/* 画面いろいろ */
+.screen{display:flex;flex-direction:column;gap:12px;flex:1;padding-top:6px}
+.screen>h2{font-size:24px}
+.lead{color:var(--ink-2);font-size:14px}
+.choice{appearance:none;width:100%;text-align:left;border:2px solid var(--ink);background:var(--card);border-radius:12px;padding:10px 12px;display:flex;gap:12px;align-items:center;cursor:pointer;color:var(--ink)}
+.choice:disabled{opacity:.42;cursor:default}
+.choice .art{width:46px;height:46px;flex:none}
+.choice .tx{flex:1;min-width:0}
+.choice h3{font-size:17px}
+.choice p{font-size:13px;color:var(--ink-2);line-height:1.5}
+.choice .price{font-family:var(--f-hand);font-weight:600;font-size:17px;white-space:nowrap}
+.choice.sold{opacity:.4;border-style:dashed}
+.choice .kind{font-size:11.5px;color:var(--ink-3);display:block}
+.picker{border:2px dashed var(--blue);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.picker p{font-size:13.5px;font-weight:700}
+.stack{display:flex;flex-direction:column;gap:8px}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.story{font-family:var(--f-hand);font-size:17px;line-height:1.8}
+.result{border-left:4px solid var(--blue);padding:4px 10px;background:var(--blue-soft);border-radius:0 8px 8px 0;font-size:14px}
+
+/* タイトル */
+.title{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:16px 0}
+.title .logo{width:min(240px,64vw)}
+.title h1{font-size:clamp(44px,13vw,60px);letter-spacing:.06em;line-height:1.15}
+.title h1 rt{font-size:13px;letter-spacing:.3em;font-weight:400;color:var(--ink-2)}
+.title .catch{font-family:var(--f-hand);font-size:18px}
+.menu{display:flex;flex-direction:column;gap:10px;width:min(300px,100%)}
+.menu .row{display:flex;gap:8px}.menu .row .btn{flex:1}
+.foot{font-size:12px;color:var(--ink-3);text-align:center}
+.ladder-logo line{stroke:var(--print);stroke-width:2.4;stroke-linecap:round}
+.ladder-logo .lr{stroke:var(--graphite);stroke-width:2.4}
+.ladder-logo .lh{stroke:var(--blue);stroke-width:4}
+.ladder-logo .le{stroke:var(--red);stroke-width:2.4}
+
+/* シート・トースト */
+.sheet{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center;background:rgba(20,24,30,.35)}
+.sheet[hidden]{display:none}
+.sheet .in{width:min(460px,100%);background:var(--paper);border-radius:16px 16px 0 0;border:2px solid var(--ink);border-bottom:0;padding-left:var(--gut);padding-right:var(--gut-r);padding-block:16px max(18px,env(safe-area-inset-bottom,0px));max-height:80vh;overflow:auto;display:flex;flex-direction:column;gap:10px}
+.sheet h3{font-size:20px}
+.sheet .row{display:flex;gap:10px;align-items:center}
+.sheet .row .art{width:52px;height:52px;flex:none}
+.sheet dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:13.5px}
+.sheet dt{color:var(--ink-2)}.sheet dd{margin:0}
+.toast{position:fixed;left:50%;bottom:calc(120px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:var(--ink);color:var(--paper);border-radius:10px;padding:8px 14px;font-size:13.5px;max-width:min(420px,92vw);text-align:center;box-shadow:0 4px 14px var(--shade)}
+.toast[hidden]{display:none}
+.list{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.list .item{display:flex;gap:10px;align-items:flex-start;border-bottom:1px solid var(--rule);padding-bottom:6px}
+.list .item b{font-family:var(--f-hand);font-size:15px;min-width:7em}
+.seg{display:flex;border:2px solid var(--ink);border-radius:10px;overflow:hidden}
+.seg button{appearance:none;flex:1;border:0;background:var(--card);padding:8px 4px;cursor:pointer;font-weight:700;min-height:42px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.howto h3{font-size:18px;margin-top:6px}
+.howto p{font-size:14px;margin-top:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-height:700px){.tag .art{width:26px;height:26px}.foe .art{width:28px;height:28px}.foe,.empty-slot{min-height:92px}.hint{font-size:12.5px}}
+
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite"></main>
+<div id="sheet" class="sheet" hidden></div>
+<div id="toast" class="toast" role="status" hidden></div>
+<script>
+// ==ENGINE START==
+// 一線打尽のルール計算。画面には触れない。乱数はすべて run.rs(シード付き)から取る
+const VERSION='0.1.0';
+const COLS=5,ROWS=7,MAXHP=50,STROKES=2,CHIME=10,LEVELS=5,ROUTE_ROWS=LEVELS-1;
+
+/* ---------- 乱数 ---------- */
+function rng(run){let t=(run.rs=(run.rs+0x6D2B79F5)>>>0);t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;}
+function rint(run,a,b){return a+Math.floor(rng(run)*(b-a+1));}
+function pick(run,arr){return arr[Math.floor(rng(run)*arr.length)];}
+function shuffle(run,arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng(run)*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function wpick(run,items,w){let tot=0;for(const x of items)tot+=w(x);if(tot<=0)return items[0];let r=rng(run)*tot;for(const x of items){r-=w(x);if(r<0)return x;}return items[items.length-1];}
+const has=(run,k)=>run.stickers.includes(k);
+
+/* ---------- 駒 ---------- */
+// atk/def は Lv1〜3。rar 0=はじめから 1=ふつう 2=めずらしい 3=とてもめずらしい
+const PIECES={
+ samurai:{n:'さむらい',s:'侍',atk:[5,7,9],def:[0,0,0],rar:0},
+ sumo:{n:'すもうとり',s:'力士',atk:[1,1,2],def:[5,7,9],rar:0},
+ hoken:{n:'ほけんがかり',s:'保健',atk:[0,0,0],def:[0,0,0],rar:0,heal:[2,3,5]},
+ ninja:{n:'にんじゃ',s:'忍者',atk:[4,5,6],def:[0,0,0],rar:1,shuriken:[3,4,6]},
+ neko:{n:'まねきねこ',s:'招き猫',atk:[0,0,0],def:[2,2,2],rar:1,coin:[3,5,8]},
+ yumi:{n:'ゆみとり',s:'弓取り',atk:[3,4,5],def:[0,0,0],rar:1,splash:[2,2,3]},
+ yuki:{n:'ゆきだるま',s:'雪だるま',atk:[1,1,2],def:[4,5,6],rar:1,chill:1},
+ kappa:{n:'かっぱ',s:'かっぱ',atk:[3,4,5],def:[2,2,2],rar:2,perTwo:[2,2,3]},
+ tengu:{n:'てんぐ',s:'天狗',atk:[4,5,6],def:[1,1,1],rar:2,straight:[5,6,8]},
+ kaminari:{n:'かみなりさま',s:'雷様',atk:[2,3,3],def:[0,0,0],rar:2,perRung:[2,2,3]},
+ nurikabe:{n:'ぬりかべ',s:'ぬりかべ',atk:[0,0,0],def:[9,11,13],rar:2},
+ daruma:{n:'だるま',s:'だるま',atk:[2,2,2],def:[3,4,5],rar:2,rise:[1,1,2]},
+ iinchou:{n:'がっきゅういいん',s:'学級委員',atk:[2,3,3],def:[2,3,3],rar:2,aura:[1,1,2]},
+ tanuki:{n:'たぬき',s:'たぬき',atk:[2,3,4],def:[2,3,4],rar:2,stroke:1},
+ oni:{n:'あかおに',s:'赤鬼',atk:[8,10,12],def:[0,0,0],rar:3,pierce:1},
+ hanabi:{n:'はなび',s:'花火',atk:[12,16,20],def:[0,0,0],rar:3,once:1},
+ momo:{n:'ももたろう',s:'桃太郎',atk:[5,6,7],def:[2,3,3],rar:3,vsBig:[4,4,6]},
+};
+const PIECE_KEYS=Object.keys(PIECES);
+function pieceDesc(k,lv){const D=PIECES[k],i=(lv||1)-1;
+ if(D.heal)return`空きマスに着くとHP+${D.heal[i]}`;
+ if(D.shuriken)return`空きマスに着くと、いちばん近い敵に手裏剣${D.shuriken[i]}(反撃なし)`;
+ if(D.coin)return`空きマスに着くとおこづかい+${D.coin[i]}円`;
+ if(D.splash)return`着いたマスの両隣の敵にも${D.splash[i]}`;
+ if(D.chill)return'当たった敵の次の攻撃を半分にする';
+ if(D.perTwo)return`通った横線2本ごとに攻+${D.perTwo[i]}`;
+ if(D.straight)return`横線を1本も通らなければ攻+${D.straight[i]}`;
+ if(D.perRung)return`通った横線1本ごとに攻+${D.perRung[i]}`;
+ if(D.rise)return`攻撃を受けきると、この戦闘のあいだ守+${D.rise[i]}`;
+ if(D.aura)return`両隣の列の駒の攻と守+${D.aura[i]}`;
+ if(D.stroke)return'空きマスに着くと、次のターン筆+1';
+ if(D.pierce)return'敵の守りを無視する';
+ if(D.once)return'1回撃つと、この戦闘ではもう撃てない';
+ if(D.vsBig)return`強敵とボスへの攻+${D.vsBig[i]}`;
+ return '';}
+
+/* ---------- 敵 ---------- */
+// pat はくり返す予告。t: atk 攻撃 / def 守り / line 横槍 / erase 消しゴム / wipe 全部消す / staple 消せない線 / move 移動 / run 2マス移動 / summon 呼ぶ / swap 駒の並びを入れ替え / sleep 眠らせる(守りつき) / glare にらむ
+const ENEMIES={
+ kasu:{n:'消しカス',hp:8,pat:[{t:'atk',v:5}]},
+ enpitsu:{n:'鉛筆',hp:15,pat:[{t:'atk',v:8},{t:'line',n:1}]},
+ keshigomu:{n:'消しゴム',hp:16,pat:[{t:'erase'},{t:'atk',v:7}]},
+ jougi:{n:'定規',hp:18,pat:[{t:'def',v:7},{t:'atk',v:11}]},
+ gabyou:{n:'画びょう',hp:9,pat:[{t:'atk',v:7}],thorns:1},
+ kezuri:{n:'鉛筆削り',hp:42,elite:1,pat:[{t:'atk',v:10},{t:'summon',k:'kasu',n:1}]},
+ hotchkiss:{n:'ホチキス',hp:38,elite:1,pat:[{t:'staple'},{t:'atk',v:9},{t:'atk',v:9}]},
+ kokuban:{n:'黒板消し',hp:70,boss:1,w:2,pat:[{t:'atk',v:8},{t:'wipe'},{t:'atk',v:11},{t:'summon',k:'kasu',n:2}]},
+ dodge:{n:'ドッジボール',hp:15,pat:[{t:'atk',v:8,move:1}]},
+ tobibako:{n:'跳び箱',hp:32,pat:[{t:'def',v:12},{t:'atk',v:13}]},
+ ichirin:{n:'一輪車',hp:17,pat:[{t:'move'},{t:'atk',v:11}]},
+ karasu:{n:'カラス',hp:12,pat:[{t:'atk',v:5}],steal:3},
+ tetsubou:{n:'鉄棒',hp:25,pat:[{t:'swap'},{t:'atk',v:9}]},
+ oonawa:{n:'大縄',hp:60,elite:1,w:2,pat:[{t:'atk',v:10},{t:'def',v:13},{t:'atk',v:12}]},
+ scoop:{n:'砂場のスコップ',hp:46,elite:1,pat:[{t:'line',n:2},{t:'atk',v:14}]},
+ chourei:{n:'朝礼台',hp:100,boss:1,w:2,pat:[{t:'sleep',v:13},{t:'atk',v:10},{t:'summon',k:'karasu',n:1},{t:'atk',v:12}]},
+ jintai:{n:'動く人体模型',hp:33,pat:[{t:'atk',v:10},{t:'move'}]},
+ beethoven:{n:'ベートーベンの肖像',hp:26,pat:[{t:'glare'},{t:'atk',v:9}]},
+ gaikotsu:{n:'理科室のがいこつ',hp:21,pat:[{t:'atk',v:9}],revive:6},
+ kaidan:{n:'十三階段',hp:36,pat:[{t:'atk',v:8,grow:1,cap:16}]},
+ piano:{n:'ひとりでに鳴るピアノ',hp:28,pat:[{t:'line',n:2},{t:'atk',v:8}]},
+ kagami:{n:'合わせ鏡',hp:17,pat:[{t:'atk',v:7}],reflect:0.25},
+ ninomiya:{n:'二宮金次郎像',hp:69,elite:1,pat:[{t:'run'},{t:'atk',v:15},{t:'def',v:16}]},
+ hanako:{n:'トイレの花子さん',hp:44,elite:1,pat:[{t:'atk',v:12,move:1}],hide3:1},
+ nanatsume:{n:'七つ目の不思議',hp:150,boss:1,w:2,phases:[
+  {n:'鏡の姿',pat:[{t:'atk',v:10},{t:'def',v:12}],reflect:0.25},
+  {n:'階段の姿',pat:[{t:'atk',v:9,grow:2,cap:20}]},
+  {n:'黒板の姿',pat:[{t:'wipe'},{t:'atk',v:14}]}]},
+};
+const CHAPTERS=[
+ {n:'放課後の教室',hpM:1,atkM:1,first:[['kasu','kasu'],['kasu','enpitsu'],['gabyou','kasu']],
+  normal:[['kasu','kasu','enpitsu'],['enpitsu','keshigomu'],['jougi','kasu','kasu'],['gabyou','gabyou','kasu'],['keshigomu','jougi'],['enpitsu','gabyou','kasu'],['enpitsu','enpitsu']],
+  elite:[['kezuri'],['hotchkiss','kasu']],boss:[['kokuban']]},
+ {n:'夕焼けの校庭',hpM:1,atkM:1,
+  normal:[['dodge','karasu','karasu'],['tobibako','karasu','karasu'],['ichirin','dodge','karasu'],['tetsubou','karasu','dodge'],['ichirin','tobibako'],['tetsubou','ichirin','karasu'],['dodge','dodge','karasu']],
+  elite:[['oonawa'],['scoop','karasu']],boss:[['chourei']]},
+ {n:'夜の校舎',hpM:1,atkM:1,
+  normal:[['jintai','gaikotsu','kagami'],['beethoven','kagami','gaikotsu'],['kaidan','kagami','gaikotsu'],['piano','jintai'],['beethoven','piano','kagami'],['gaikotsu','gaikotsu','kagami'],['jintai','kaidan']],
+  elite:[['ninomiya'],['hanako','kagami']],boss:[['nanatsume']]},
+];
+
+/* ---------- ペンとシール ---------- */
+const PENS={
+ hl:{n:'蛍光ペン',d:'この線を通った駒は攻+2',u:1},
+ brush:{n:'筆ペン',d:'この線を通った駒は守+2',u:1},
+ ball:{n:'ボールペン',d:'筆を使わずに引ける。敵に消されない',u:2},
+ red:{n:'赤ペン',d:'一方通行。駒は曲がるが、敵の攻撃はまっすぐ通り抜ける',u:1},
+ ruler:{n:'定規',d:'となりの縦線をまたいで、2つ先とつなぐ長い線',u:1},
+ tape:{n:'修正テープ',d:'印刷の線も含めて1本消す。筆を使わない',u:1},
+};
+const PEN_KEYS=Object.keys(PENS);
+const STICKERS={
+ janken:{n:'じゃんけん',d:'駒と敵にグー・チョキ・パーがつく。勝つ相手には攻2倍、負ける相手には半分',g:1,p:80},
+ korogashi:{n:'鉛筆転がし',d:'毎ターン鉛筆を転がし、出た目(1〜5)の列の駒が攻+4。6なら全員+1',g:1,p:70},
+ marubatsu:{n:'〇×ゲーム',d:'隣り合う3マスの敵にまとめて当てると、その敵に追加4ダメージ',g:1,p:70},
+ acchimuite:{n:'あっち向いてホイ',d:'出発した列からずれた列の数だけ攻+',g:1,p:80},
+ daruma_s:{n:'だるまさんがころんだ',d:'動いたばかりの敵に当てると攻2倍',g:1,p:60},
+ sekigae:{n:'席替え',d:'戦闘ごとに1回、隣り合う駒2つを筆を使わずに入れ替えられる',g:1,p:70},
+ domino:{n:'ドミノ倒し',d:'敵を倒したとき、余ったダメージが隣の敵に入る',g:1,p:70},
+ otoshi:{n:'消しゴム落とし',d:'はしのマス(1番・5番)の敵は、HPが3割を切ると落ちる',g:1,p:70},
+ fukuwarai:{n:'福笑い',d:'毎ターンのはじめに敵の並びが入れ替わる。そのかわり敵のHPが2割へる',g:1,p:60},
+ kakurenbo:{n:'かくれんぼ',d:'毎ターン駒が1つ隠れ、その駒への攻撃は外れる',g:1,p:80},
+ yobi:{n:'予備の鉛筆',d:'1ターン目だけ筆+2',g:2,p:60},
+ shitajiki:{n:'下じき',d:'敵の横槍が入らない',g:2,p:60},
+ cap:{n:'鉛筆キャップ',d:'自分の引いた線が敵に消されない',g:2,p:60},
+ sharpen:{n:'シャーペン',d:'毎ターン1回、筆を使わずに線を消せる',g:2,p:80},
+ akamaru:{n:'赤丸',d:'線を1本も引かなかったターンの次は筆+2',g:2,p:60},
+ randoseru:{n:'ランドセル',d:'ペンの使える回数+1',g:2,p:70},
+ hanamaru:{n:'はなまる',d:'敵を倒すたびにおこづかい+3円',g:3,p:60},
+ nafuda:{n:'名札',d:'左はしの駒の攻+3',g:3,p:70},
+ uwabaki:{n:'上履き',d:'1ターン目は全員の攻+3',g:3,p:70},
+ toban:{n:'給食当番の帽子',d:'戦闘に勝つとHP+4',g:3,p:70},
+ renraku:{n:'連絡帳',d:'強敵とボスの最初のターン、敵の攻撃が0',g:3,p:70},
+ taisou:{n:'体操服',d:'HPの最大+10',g:3,p:80},
+ hata:{n:'学級旗',d:'5つの駒がすべて違う種類なら、全員の攻と守+1',g:3,p:70},
+ origami:{n:'金の折り紙',d:'購買部の値段が2割引き',g:3,p:60},
+};
+const STICKER_KEYS=Object.keys(STICKERS);
+const GAKKYU={
+ ichi:{n:'1年1組',d:'侍2・力士2・保健係。まずはここから',pieces:['samurai','sumo','hoken','sumo','samurai'],pens:[],stickers:[]},
+ zukou:{n:'図工クラブ',d:'雷様が入り、蛍光ペンと定規を持って出発',pieces:['samurai','sumo','kaminari','sumo','samurai'],pens:['hl','ruler'],stickers:[],unlock:1},
+ nicchoku:{n:'日直当番',d:'忍者と招き猫が入り、はなまるのシールつき',pieces:['ninja','sumo','neko','sumo','samurai'],pens:[],stickers:['hanamaru'],unlock:2},
+};
+
+/* ---------- ラン ---------- */
+function newRun(seed,gk){gk=GAKKYU[gk]?gk:'ichi';const G=GAKKYU[gk];
+ const run={v:1,seed:seed>>>0,rs:seed>>>0,gk,ch:0,hp:MAXHP,maxHp:MAXHP,money:0,pieces:[],pens:G.pens.slice(),stickers:[],flags:{buff:0,stroke:0},
+  stats:{battles:0,kills:0,maxHit:0,turns:0,taken:0,elites:0},seen:[],phase:'map',b:null,map:null,reward:null,shop:null,ev:null,msg:''};
+ for(const k of G.pieces)addPiece(run,k,-1);
+ for(const s of G.stickers)addSticker(run,s);
+ genMap(run);return run;}
+function addPiece(run,k,idx){const p={k,lv:1};if(has(run,'janken'))p.rps=rint(run,0,2);
+ if(idx>=0&&idx<run.pieces.length)run.pieces[idx]=p;else run.pieces.push(p);return p;}
+function addSticker(run,k){if(!STICKERS[k]||has(run,k))return;run.stickers.push(k);
+ if(k==='taisou'){run.maxHp+=10;run.hp+=10;}
+ if(k==='janken')for(const p of run.pieces)if(p.rps==null)p.rps=rint(run,0,2);}
+function heal(run,n){run.hp=Math.min(run.maxHp,run.hp+n);}
+function randPiece(run,w,excl){excl=excl||[];const ks=PIECE_KEYS.filter(k=>PIECES[k].rar>0&&!excl.includes(k));return wpick(run,ks,k=>w[PIECES[k].rar]);}
+function randPen(run,excl){excl=excl||[];const ks=PEN_KEYS.filter(k=>!run.pens.includes(k)&&!excl.includes(k));return ks.length?pick(run,ks):null;}
+function stickerOpts(run,n){return shuffle(run,STICKER_KEYS.filter(k=>!has(run,k))).slice(0,n);}
+
+/* ---------- 道中あみだ ---------- */
+function genMap(run){const nodes=[Array(COLS).fill('battle')];
+ for(let tries=0;tries<80;tries++){
+  const bag=['elite','elite',rng(run)<0.5?'elite':'event','event','event','shop','shop','rest','treasure'];
+  while(bag.length<15)bag.push('battle');const sh=shuffle(run,bag);
+  if(sh.slice(0,5).includes('elite'))continue;
+  const lv=[sh.slice(0,5),sh.slice(5,10),sh.slice(10,15)];
+  if(lv.some(l=>l.filter(x=>x==='battle'||x==='elite').length<1))continue;
+  nodes.push(...lv);break;}
+ if(nodes.length<4)nodes.push(['battle','event','battle','shop','battle'],['elite','battle','event','battle','rest'],['battle','treasure','elite','battle','event']);
+ nodes.push(shuffle(run,['rest','rest','rest','shop','shop']));
+ const rungs=[];
+ for(let r=0;r<ROUTE_ROWS;r++){const n=rint(run,1,2);for(let i=0;i<n;i++){const free=[];for(let a=0;a<COLS-1;a++)if(!rungs.some(g=>g.r===r&&g.a<=a+1&&g.b>=a))free.push(a);if(free.length){const a=pick(run,free);rungs.push({r,a,b:a+1});}}}
+ run.map={nodes,rungs,lvl:-1,col:-1,pencil:1,done:[]};run.phase='map';}
+function routeNext(map,r,c){for(const g of map.rungs)if(g.r===r){if(g.a===c)return g.b;if(g.b===c)return g.a;}return c;}
+function routePath(map,start){const cols=[start];let c=start;for(let r=0;r<ROUTE_ROWS;r++){c=routeNext(map,r,c);cols.push(c);}return cols;}
+function routeCanPut(map,r,a){if(r<0||r>=ROUTE_ROWS||a<0||a>=COLS-1)return false;if(map.lvl>=0&&r<map.lvl)return false;return!map.rungs.some(g=>g.r===r&&g.a<=a+1&&g.b>=a);}
+function routePencil(run,r,a){const m=run.map;if(m.pencil<1||!routeCanPut(m,r,a))return false;m.rungs.push({r,a,b:a+1,me:1});m.pencil--;return true;}
+function chooseStart(run,col){const m=run.map;if(m.lvl!==-1)return false;m.col=col;m.lvl=0;enterNode(run);return true;}
+function advance(run){const m=run.map;if(run.phase!=='map'||m.lvl<0)return false;
+ if(m.lvl>=LEVELS-1){m.lvl=LEVELS;startBattle(run,'boss');return true;}
+ m.col=routeNext(m,m.lvl,m.col);m.lvl++;enterNode(run);return true;}
+function enterNode(run){const m=run.map,t=m.nodes[m.lvl][m.col];m.done.push([m.lvl,m.col]);run.msg='';
+ if(t==='battle'||t==='elite')startBattle(run,t==='elite'?'elite':'normal');
+ else if(t==='shop')genShop(run);
+ else if(t==='rest')run.phase='rest';
+ else if(t==='event')startEvent(run);
+ else if(t==='treasure'){run.reward={money:0,opts:[],stickers:stickerOpts(run,2),treasure:1};run.phase='reward';}}
+function nodeDone(run){run.phase='map';run.reward=null;run.shop=null;run.ev=null;}
+
+/* ---------- 戦闘: 盤 ---------- */
+function canPut(b,r,a,bb,reserved){if(r<0||r>=ROWS||a<0||bb>=COLS||a>=bb)return false;
+ for(const g of b.rungs)if(g.r===r&&g.a<=bb&&g.b>=a)return false;
+ if(reserved)for(const p of reserved)if(p.r===r&&p.a<=bb&&p.a+1>=a)return false;return true;}
+function addRung(b,g){g.id=b.uid++;b.rungs.push(g);return g;}
+function removeRung(b,id){b.rungs=b.rungs.filter(x=>x.id!==id);}
+function freePositions(b,reserved){const out=[];for(let r=0;r<ROWS;r++)for(let a=0;a<COLS-1;a++)if(canPut(b,r,a,a+1,reserved))out.push({r,a});return out;}
+function enemyCanErase(run,g){return g.k!=='ink'&&g.k!=='ball'&&!(g.me&&has(run,'cap'));}
+function paths(b){const at=new Int16Array(ROWS*COLS).fill(-1);b.rungs.forEach((g,i)=>{at[g.r*COLS+g.a]=i;at[g.r*COLS+g.b]=i;});
+ const down=[],cross=[],up=[];
+ for(let c0=0;c0<COLS;c0++){let c=c0;const cr=[];for(let r=0;r<ROWS;r++){const i=at[r*COLS+c];if(i>=0){const g=b.rungs[i];cr.push(g);c=g.a===c?g.b:g.a;}}down.push(c);cross.push(cr);}
+ for(let c0=0;c0<COLS;c0++){let c=c0;for(let r=ROWS-1;r>=0;r--){const i=at[r*COLS+c];if(i>=0){const g=b.rungs[i];if(g.k!=='red')c=g.a===c?g.b:g.a;}}up.push(c);}
+ return{down,up,cross};}
+// 駒の道すじ(描画用): 各段の通過後の列
+function route(b,c0){const cols=[c0];let c=c0;for(let r=0;r<ROWS;r++){const g=b.rungs.find(x=>x.r===r&&(x.a===c||x.b===c));if(g)c=g.a===c?g.b:g.a;cols.push(c);}return cols;}
+function routeUp(b,s0){const cols=[s0];let c=s0;for(let r=ROWS-1;r>=0;r--){const g=b.rungs.find(x=>x.r===r&&(x.a===c||x.b===c));if(g&&g.k!=='red')c=g.a===c?g.b:g.a;cols.push(c);}return cols.reverse();}
+
+/* ---------- 戦闘: 敵 ---------- */
+function phaseOf(e){const D=ENEMIES[e.k];if(!D.phases)return 0;const f=e.hp/e.max;return f>2/3?0:f>1/3?1:2;}
+function patOf(e){const D=ENEMIES[e.k];return D.phases?D.phases[e.phase||0].pat:D.pat;}
+function reflectOf(e){const D=ENEMIES[e.k];return D.phases?(D.phases[e.phase||0].reflect||0):(D.reflect||0);}
+function enemyName(e){const D=ENEMIES[e.k];return D.phases?D.n+'('+D.phases[e.phase||0].n+')':D.n;}
+function occupancy(b){const occ=Array(COLS).fill(null);for(const e of b.en)if(e.hp>0)for(let s=0;s<e.w;s++)occ[e.slot+s]=e;return occ;}
+function freeSlots(b,excl){const occ=occupancy(b);const out=[];for(let s=0;s<COLS;s++)if(!occ[s]&&!(excl&&excl.includes(s)))out.push(s);return out;}
+function spawn(run,b,k,slot){const D=ENEMIES[k];let hp=Math.round(D.hp*(CHAPTERS[run.ch].hpM||1));if(has(run,'fukuwarai'))hp=Math.max(1,Math.ceil(hp*0.8));
+ const e={id:b.uid++,k,hp,max:hp,slot,w:D.w||1,step:0,buff:0,grow:0,chill:false,moved:false,revived:false,phase:0,intent:null};
+ if(!D.boss&&!D.elite&&D.pat.length>1)e.step=rint(run,0,D.pat.length-1);
+ if(has(run,'janken'))e.rps=rint(run,0,2);b.en.push(e);return e;}
+function atkVal(b,e){const it=e.intent;if(!it||it.t!=='atk')return 0;let v=Math.round(it.v*(b.atkM||1))+(e.buff||0)+(e.grow||0);if(it.cap)v=Math.min(v,Math.round(it.cap*(b.atkM||1)));
+ const ct=b.kind==='boss'?CHIME+4:CHIME;if(b.turn>ct)v+=2*(b.turn-ct);if(b.noAtk)v=0;return v;}
+function pickSlot(run,b,e,dist,taken){if(e.w>1)return null;const fs=freeSlots(b,taken).filter(s=>s!==e.slot);if(!fs.length)return null;
+ const exact=fs.filter(s=>Math.abs(s-e.slot)===dist);if(exact.length)return pick(run,exact);
+ const near=fs.filter(s=>Math.abs(s-e.slot)<=dist);if(near.length)return pick(run,near);return dist>1?pick(run,fs):null;}
+function revealIntents(run,b){const res=[],moves=[];
+ for(const e of b.en.slice().sort((x,y)=>x.slot-y.slot)){if(e.hp<=0)continue;const pat=patOf(e);const it=Object.assign({},pat[e.step%pat.length]);
+  if(it.t==='line'||it.t==='staple'){it.pos=[];for(let i=0;i<(it.n||1);i++){const fp=freePositions(b,res);if(!fp.length)break;const p=pick(run,fp);it.pos.push(p);res.push(p);}}
+  if(it.t==='erase'){const c=b.rungs.filter(g=>enemyCanErase(run,g));const mine=c.filter(g=>g.me);it.target=c.length?pick(run,mine.length?mine:c).id:0;}
+  if(it.t==='move'||it.move||it.t==='run'){it.to=pickSlot(run,b,e,it.t==='run'?2:1,moves);if(it.to!=null)moves.push(it.to);}
+  if(it.t==='swap')it.c=rint(run,0,COLS-2);
+  e.intent=it;}}
+function shuffleEnemies(run,b){const movers=b.en.filter(e=>e.hp>0&&e.w===1);if(movers.length<1)return;
+ const big=b.en.filter(e=>e.hp>0&&e.w>1);const slots=[];for(let s=0;s<COLS;s++)if(!big.some(e=>s>=e.slot&&s<e.slot+e.w))slots.push(s);
+ const sh=shuffle(run,slots);movers.forEach((e,i)=>{if(e.slot!==sh[i]){e.slot=sh[i];}});}
+
+/* ---------- 戦闘: はじまりとターン ---------- */
+function startBattle(run,kind){const C=CHAPTERS[run.ch];let group;
+ if(kind==='normal'&&run.stats.battles===0&&C.first)group=pick(run,C.first);else group=pick(run,C[kind]);
+ const b={kind,turn:0,rungs:[],uid:1,en:[],lineup:[0,1,2,3,4],ps:run.pieces.map(()=>({sleep:0,stun:0,used:false,rise:0})),
+  strokes:0,penUses:{},edits:[],nextStroke:0,drew:0,freeErase:0,sekigae:has(run,'sekigae')?1:0,noAtk:false,roll:0,hidden:-1,
+  allDiff:new Set(run.pieces.map(p=>p.k)).size===run.pieces.length,over:false,won:false,atkM:C.atkM||1};
+ for(const p of run.pens)b.penUses[p]=PENS[p].u+(has(run,'randoseru')?1:0);
+ run.b=b;
+ const big=group.filter(k=>(ENEMIES[k].w||1)>1),small=group.filter(k=>(ENEMIES[k].w||1)===1);
+ for(const k of big)spawn(run,b,k,rint(run,1,2));
+ for(const k of small){const fs=freeSlots(b);if(fs.length)spawn(run,b,k,pick(run,fs));}
+ const n=kind==='normal'?4:5;for(let i=0;i<n;i++){const fp=freePositions(b);if(!fp.length)break;const p=pick(run,fp);addRung(b,{r:p.r,a:p.a,b:p.a+1,k:'ink'});}
+ run.phase='battle';startTurn(run);return b;}
+function startTurn(run){const b=run.b;b.turn++;b.edits=[];b.drew=0;b.freeErase=0;
+ b.strokes=STROKES+b.nextStroke+(run.flags.stroke||0)+(b.turn===1&&has(run,'yobi')?2:0);b.nextStroke=0;
+ b.noAtk=b.turn===1&&b.kind!=='normal'&&has(run,'renraku');
+ b.roll=has(run,'korogashi')?rint(run,1,6):0;
+ b.hidden=has(run,'kakurenbo')?rint(run,0,COLS-1):-1;
+ if(has(run,'fukuwarai')&&b.turn>1)shuffleEnemies(run,b);
+ revealIntents(run,b);}
+
+/* ---------- 戦闘: 線を書く・消す ---------- */
+function drawRung(run,r,a,pen){const b=run.b;pen=pen||'pencil';const span=pen==='ruler'?2:1,free=pen==='ball';
+ if(pen==='tape')return{ok:false,why:'修正テープは消すときに使う'};
+ if(a+span>=COLS)a=COLS-1-span;
+ if(pen!=='pencil'&&!(b.penUses[pen]>0))return{ok:false,why:'このペンはもう使えない'};
+ if(!free&&b.strokes<1)return{ok:false,why:'筆が残っていない'};
+ if(!canPut(b,r,a,a+span))return{ok:false,why:'となりの線とくっつくので引けない'};
+ const g=addRung(b,{r,a,b:a+span,k:pen,me:true,t:b.turn});if(!free)b.strokes--;if(pen!=='pencil')b.penUses[pen]--;b.drew++;
+ b.edits.push({t:'draw',id:g.id,pen,free});return{ok:true,g};}
+function eraseRung(run,id,pen){const b=run.b;const g=b.rungs.find(x=>x.id===id);if(!g)return{ok:false,why:'線がない'};
+ const ei=b.edits.findIndex(x=>x.t==='draw'&&x.id===id);
+ if(ei>=0){const ed=b.edits[ei];b.edits.splice(ei,1);removeRung(b,id);if(!ed.free)b.strokes++;if(ed.pen!=='pencil')b.penUses[ed.pen]++;b.drew--;return{ok:true,undo:true};}
+ if(pen==='tape'){if(!(b.penUses.tape>0))return{ok:false,why:'修正テープはもう使えない'};b.penUses.tape--;removeRung(b,id);b.edits.push({t:'erase',g,pen:'tape'});return{ok:true};}
+ if(g.k==='ink')return{ok:false,why:g.staple?'ホチキスの線は消せない':'印刷の線は消せない'};
+ const free=has(run,'sharpen')&&!b.freeErase;
+ if(!free&&b.strokes<1)return{ok:false,why:'筆が残っていない'};
+ if(free)b.freeErase=1;else b.strokes--;
+ removeRung(b,id);b.edits.push({t:'erase',g,free});return{ok:true};}
+function undo(run){const b=run.b;const ed=b.edits.pop();if(!ed)return false;
+ if(ed.t==='draw'){removeRung(b,ed.id);if(!ed.free)b.strokes++;if(ed.pen!=='pencil')b.penUses[ed.pen]++;b.drew--;}
+ else if(ed.t==='erase'){if(!canPut(b,ed.g.r,ed.g.a,ed.g.b)){b.edits.push(ed);return false;}b.rungs.push(ed.g);
+  if(ed.pen==='tape')b.penUses.tape++;else if(ed.free)b.freeErase=0;else b.strokes++;}
+ else if(ed.t==='seki'){const t=b.lineup[ed.c];b.lineup[ed.c]=b.lineup[ed.c+1];b.lineup[ed.c+1]=t;b.sekigae++;}
+ return true;}
+function sekigae(run,c){const b=run.b;if(!(b.sekigae>0)||c<0||c>=COLS-1)return false;const t=b.lineup[c];b.lineup[c]=b.lineup[c+1];b.lineup[c+1]=t;b.sekigae--;b.edits.push({t:'seki',c});return true;}
+// ボットと画面の見込み用: いま取れる手
+function actions(run){const b=run.b,acts=[];
+ for(let r=0;r<ROWS;r++)for(let a=0;a<COLS-1;a++){if(b.strokes>0&&canPut(b,r,a,a+1))acts.push({t:'draw',r,a,pen:'pencil'});
+   for(const p of run.pens){if(p==='tape'||!(b.penUses[p]>0)||(b.strokes<1&&p!=='ball'))continue;const span=p==='ruler'?2:1;if(a+span<COLS&&canPut(b,r,a,a+span))acts.push({t:'draw',r,a,pen:p});}}
+ if(b.strokes>0||(has(run,'sharpen')&&!b.freeErase))for(const g of b.rungs)if(g.k!=='ink'&&!b.edits.some(x=>x.t==='draw'&&x.id===g.id))acts.push({t:'erase',id:g.id});
+ if(b.penUses.tape>0)for(const g of b.rungs)if(!b.edits.some(x=>x.t==='draw'&&x.id===g.id))acts.push({t:'erase',id:g.id,pen:'tape'});
+ return acts;}
+function doAction(run,a){return a.t==='draw'?drawRung(run,a.r,a.a,a.pen):eraseRung(run,a.id,a.pen);}
+
+/* ---------- 戦闘: 駒の強さ ---------- */
+function pieceStats(run,b,c,P){const pi=b.lineup[c],pc=run.pieces[pi],D=PIECES[pc.k],i=pc.lv-1,ps=b.ps[pi];
+ let atk=D.atk[i],def=D.def[i];const cr=P.cross[c],n=cr.length;
+ if(D.perRung)atk+=D.perRung[i]*n;
+ if(D.perTwo)atk+=D.perTwo[i]*Math.floor(n/2);
+ if(D.straight&&n===0)atk+=D.straight[i];
+ for(const g of cr){if(g.k==='hl')atk+=2;if(g.k==='brush')def+=2;}
+ for(const nc of[c-1,c+1]){if(nc<0||nc>=COLS)continue;const q=run.pieces[b.lineup[nc]],QD=PIECES[q.k];if(QD.aura){atk+=QD.aura[q.lv-1];def+=QD.aura[q.lv-1];}}
+ if(c===0&&has(run,'nafuda'))atk+=3;
+ if(b.turn===1&&has(run,'uwabaki'))atk+=3;
+ if(b.roll){if(b.roll===c+1)atk+=4;else if(b.roll===6)atk+=1;}
+ if(has(run,'acchimuite'))atk+=Math.abs(P.down[c]-c);
+ if(b.allDiff&&has(run,'hata')){atk+=1;def+=1;}
+ if(run.flags.buff)atk+=run.flags.buff;
+ def+=ps.rise;let state='';
+ if(D.once&&ps.used){atk=0;state='used';}
+ if(ps.sleep>0){atk=0;state='sleep';}
+ if(ps.stun>0){atk=0;def=0;state='stun';}
+ return{atk,def,state,D,pi,i,k:pc.k};}
+const emptySkill=D=>!!(D.heal||D.coin||D.stroke||D.shuriken);
+const rpsWin=(a,b)=>a==null||b==null?0:a===b?0:(a+1)%3===b?1:-1; // 0グー 1チョキ 2パー: グーはチョキに勝つ
+
+/* ---------- 戦闘: せーの(見込みにも使う。b を書き換えない) ---------- */
+function clash(run,b){const P=paths(b);
+ const X=b.en.map(e=>({e,hp:e.hp,blk:0,alive:e.hp>0,chill:e.chill,chillUsed:false,revived:e.revived}));
+ const occ=Array(COLS).fill(-1);X.forEach((x,i)=>{if(x.alive)for(let s=0;s<x.e.w;s++)occ[x.e.slot+s]=i;});
+ for(const x of X){const it=x.e.intent;if(x.alive&&it&&(it.t==='def'||it.t==='sleep'))x.blk=Math.round(it.v*(b.atkM||1));}
+ const R={P,acts:[],dealt:0,kills:[],heal:0,money:0,taken:0,stroke:0,thorns:0,reflect:0,steal:0,attacks:[],rise:[],used:[],big:0,revive:[],drops:0,marubatsu:false,X,occ,extra:[]};
+ const near=(s)=>{let best=null,bd=99;for(const x of X){if(!x.alive)continue;for(let k=0;k<x.e.w;k++){const d=Math.abs(x.e.slot+k-s);if(d<bd){bd=d;best=x;}}}return best;};
+ const nextTo=(x)=>{let best=null,bd=99;for(const y of X){if(!y.alive||y===x)continue;const d=y.e.slot>=x.e.slot?y.e.slot-x.e.slot:(x.e.slot-y.e.slot)+0.5;if(d<bd){bd=d;best=y;}}return best;};
+ const damage=(x,d,pierce,src)=>{if(!x||!x.alive||d<=0)return 0;let dd=d;if(!pierce){const ab=Math.min(x.blk,dd);x.blk-=ab;dd-=ab;}if(dd<=0)return 0;
+  const before=x.hp;x.hp-=dd;R.dealt+=Math.min(dd,before);
+  if(x.hp>0&&has(run,'otoshi')&&x.e.w===1&&(x.e.slot===0||x.e.slot===COLS-1)&&x.hp<x.e.max*0.3){x.hp=0;R.drops++;}
+  if(x.hp<=0){const D=ENEMIES[x.e.k];
+   if(D.revive&&!x.revived){x.revived=true;x.hp=D.revive;R.revive.push(x.e.id);}
+   else{x.alive=false;R.kills.push(x.e.id);if(has(run,'hanamaru'))R.money+=3;
+    const over=dd-before;if(over>0&&has(run,'domino')){const y=nextTo(x);if(y){const dmg=damage(y,over,true,'domino');R.extra.push({t:'domino',from:x.e.id,to:y.e.id,dmg});}}}}
+  return dd;};
+ const slotHit=Array(COLS).fill(false);
+ // 応援: 敵のいないマスに着いた駒(空きマスの特技がない駒)の数だけ、敵に当たる駒のうち攻がいちばん高い1つ(同じなら左)の攻が増える
+ const STS=[];let cheer=0;for(let c=0;c<COLS;c++){const st=pieceStats(run,b,c,P);STS.push(st);if(occ[P.down[c]]<0&&!st.state&&!emptySkill(st.D))cheer++;}
+ let star=-1;for(let c=0;c<COLS;c++){const st=STS[c];if(occ[P.down[c]]<0||st.state)continue;if(star<0||st.atk>STS[star].atk)star=c;}
+ R.cheer=cheer;R.star=star;
+ for(let c=0;c<COLS;c++){const st=STS[c],s=P.down[c],xi=occ[s],x=xi>=0?X[xi]:null;
+  const act={c,slot:s,k:st.k,pi:st.pi,atk:st.atk,def:st.def,state:st.state,target:x?x.e.id:0,dmg:0,kind:''};
+  if(st.state==='stun'){act.kind='stun';R.acts.push(act);continue;}
+  if(x&&x.alive){
+   let a=st.atk;if(c===star)a+=cheer;
+   if(ENEMIES[x.e.k].hide3&&x.e.slot!==2&&a>0){a=Math.floor(a/2);act.hide=1;}
+   if(st.D.vsBig&&(ENEMIES[x.e.k].elite||ENEMIES[x.e.k].boss))a+=st.D.vsBig[st.i];
+   if(has(run,'janken')&&a>0){const w=rpsWin(run.pieces[st.pi].rps,x.e.rps);act.rps=w;if(w>0)a*=2;else if(w<0)a=Math.floor(a/2);}
+   if(has(run,'daruma_s')&&x.e.moved&&a>0){a*=2;act.daruma=1;}
+   act.kind='hit';act.atk=a;
+   if(a>0){const d=damage(x,a,!!st.D.pierce);act.dmg=d;R.big=Math.max(R.big,d);slotHit[s]=true;
+    if(d>0&&ENEMIES[x.e.k].thorns)R.thorns+=ENEMIES[x.e.k].thorns;
+    const rf=reflectOf(x.e);if(rf&&d>0)R.reflect+=Math.floor(d*rf);}
+   if(st.D.chill&&x.alive){x.chill=true;act.chill=1;}
+   if(st.D.splash){act.splash=[];for(const ns of[s-1,s+1]){if(ns<0||ns>=COLS)continue;const yi=occ[ns];if(yi>=0&&yi!==xi&&X[yi].alive){const d=damage(X[yi],st.D.splash[st.i],true);act.splash.push({id:X[yi].e.id,dmg:d});}}}
+   if(st.D.once&&st.atk>0)R.used.push(st.pi);
+  }else{act.kind='empty';
+   if(!st.state){
+    if(st.D.heal){R.heal+=st.D.heal[st.i];act.heal=st.D.heal[st.i];}
+    if(st.D.coin){R.money+=st.D.coin[st.i];act.coin=st.D.coin[st.i];}
+    if(st.D.stroke){R.stroke+=1;act.stroke=1;}
+    if(st.D.shuriken){const t=near(s);if(t){const d=damage(t,st.D.shuriken[st.i],false);act.shuriken={id:t.e.id,dmg:d};}}
+   }}
+  R.acts.push(act);}
+ if(has(run,'marubatsu'))for(let s=0;s+2<COLS;s++){if(slotHit[s]&&slotHit[s+1]&&slotHit[s+2]){const set=new Set();for(let k=s;k<s+3;k++){const xi=occ[k];if(xi>=0&&X[xi].alive)set.add(xi);}
+   for(const xi of set){const d=damage(X[xi],4,true);R.extra.push({t:'marubatsu',to:X[xi].e.id,dmg:d});}R.marubatsu=true;break;}}
+ for(const x of X){if(!x.alive)continue;const it=x.e.intent;if(!it||it.t!=='atk')continue;
+  let v=atkVal(b,x.e);if(x.chill&&v>0){v=Math.floor(v/2);x.chillUsed=true;}
+  for(let k=0;k<x.e.w;k++){const s=x.e.slot+k,c=P.up[s],st=pieceStats(run,b,c,P);
+   const a={id:x.e.id,slot:s,c,pi:st.pi,v,def:st.def,taken:0,miss:false};
+   if(b.hidden===c)a.miss=true;
+   else{a.taken=Math.max(0,v-st.def);R.taken+=a.taken;if(a.taken===0&&v>0&&st.D.rise)R.rise.push({pi:st.pi,v:st.D.rise[st.i]});
+    if(a.taken>0&&ENEMIES[x.e.k].steal)R.steal+=ENEMIES[x.e.k].steal;}
+   R.attacks.push(a);}}
+ R.taken+=R.thorns+R.reflect;R.won=X.every(x=>!x.alive);return R;}
+
+function commit(run){const b=run.b;if(!b||b.over)return null;const R=clash(run,b);
+ for(const x of R.X){const e=x.e;e.hp=Math.max(0,x.hp);e.revived=x.revived;e.chill=x.chillUsed?false:x.chill;}
+ for(const pi of R.used)b.ps[pi].used=true;
+ for(const r of R.rise)b.ps[r.pi].rise+=r.v;
+ heal(run,R.heal);run.money+=R.money;
+ run.hp-=R.taken;run.stats.taken+=R.taken;run.stats.turns++;
+ if(R.won&&run.hp<1)run.hp=1; // 最後の敵を倒したターンは、トゲや鏡の返しでは倒れない
+ if(R.steal)run.money=Math.max(0,run.money-R.steal);
+ b.nextStroke+=R.stroke;run.stats.kills+=R.kills.length;run.stats.maxHit=Math.max(run.stats.maxHit,R.big);
+ if(R.won){winBattle(run);return R;}
+ if(run.hp<=0){run.hp=0;b.over=true;run.phase='over';return R;}
+ R.after=endOfTurn(run,b,R);
+ b.en=b.en.filter(e=>e.hp>0);
+ if(!b.en.length){winBattle(run);return R;}
+ startTurn(run);return R;}
+function endOfTurn(run,b,R){const log=[];
+ for(const ps of b.ps){if(ps.sleep>0)ps.sleep--;if(ps.stun>0)ps.stun--;}
+ for(const e of b.en)e.moved=false;
+ const slotFree=(s,e)=>!b.en.some(o=>o!==e&&o.hp>0&&s>=o.slot&&s<o.slot+o.w);
+ for(const e of b.en.slice().sort((x,y)=>x.slot-y.slot)){if(e.hp<=0)continue;const it=e.intent;if(!it)continue;
+  if(it.t==='line'){if(has(run,'shitajiki'))log.push({t:'blocked',id:e.id});else for(const p of it.pos){if(canPut(b,p.r,p.a,p.a+1)){addRung(b,{r:p.r,a:p.a,b:p.a+1,k:'enemy'});log.push({t:'line',id:e.id,r:p.r,a:p.a});}else log.push({t:'blocked',id:e.id});}}
+  else if(it.t==='staple'){for(const p of it.pos)if(canPut(b,p.r,p.a,p.a+1)){addRung(b,{r:p.r,a:p.a,b:p.a+1,k:'ink',staple:1});log.push({t:'staple',id:e.id,r:p.r,a:p.a});}}
+  else if(it.t==='erase'){let g=it.target?b.rungs.find(x=>x.id===it.target):null;if(!g||!enemyCanErase(run,g)){const mine=b.rungs.filter(x=>x.me&&enemyCanErase(run,x));g=mine.length?mine[mine.length-1]:null;}
+   if(g&&enemyCanErase(run,g)){removeRung(b,g.id);log.push({t:'erase',id:e.id,r:g.r,a:g.a,b:g.b});}}
+  else if(it.t==='wipe'){const n=b.rungs.filter(g=>enemyCanErase(run,g)).length;b.rungs=b.rungs.filter(g=>!enemyCanErase(run,g));log.push({t:'wipe',id:e.id,n});}
+  else if(it.t==='move'||it.t==='run'||(it.t==='atk'&&it.move)){if(it.to!=null&&slotFree(it.to,e)){log.push({t:'move',id:e.id,from:e.slot,to:it.to});e.slot=it.to;e.moved=true;}}
+  else if(it.t==='summon'){for(let i=0;i<(it.n||1);i++){const fs=freeSlots(b);if(!fs.length)break;const ne=spawn(run,b,it.k,pick(run,fs));log.push({t:'summon',id:e.id,nid:ne.id,slot:ne.slot});}}
+  else if(it.t==='swap'){const t=b.lineup[it.c];b.lineup[it.c]=b.lineup[it.c+1];b.lineup[it.c+1]=t;log.push({t:'swap',id:e.id,c:it.c});}
+  else if(it.t==='sleep'||it.t==='glare'){for(let c=0;c<COLS;c++){const s=R.P.down[c];if(s>=e.slot&&s<e.slot+e.w){const ps=b.ps[b.lineup[c]];if(it.t==='sleep')ps.sleep=1;else ps.stun=1;log.push({t:it.t,id:e.id,c});}}}
+  if(it.t==='atk'&&it.grow)e.grow+=it.grow;}
+ for(const e of b.en)if(e.hp>0){e.step++;if(ENEMIES[e.k].phases){const p=phaseOf(e);if(p!==e.phase){e.phase=p;e.step=0;log.push({t:'phase',id:e.id,p});}}}
+ if(b.drew===0&&has(run,'akamaru'))b.nextStroke+=2;
+ return log;}
+function winBattle(run){const b=run.b;b.over=true;b.won=true;run.stats.battles++;if(b.kind==='elite')run.stats.elites++;
+ if(has(run,'toban'))heal(run,4);
+ run.flags.buff=0;run.flags.stroke=0;
+ const k=b.kind;const m=k==='boss'?50:k==='elite'?rint(run,20,30):rint(run,8,15);run.money+=m;
+ run.reward={money:m,opts:rewardOpts(run,k),stickers:k==='normal'?null:stickerOpts(run,k==='boss'?3:2),kind:k};
+ if(k==='boss')run.hp+=Math.ceil((run.maxHp-run.hp)/2);
+ run.phase='reward';}
+function rewardOpts(run,kind){const w=kind==='normal'?[0,10,5,1]:kind==='elite'?[0,5,8,3]:[0,2,7,6];
+ const p1=randPiece(run,w),p2=randPiece(run,w,[p1]);const opts=[{t:'piece',k:p1},{t:'piece',k:p2}];
+ const pen=run.pens.length<3?randPen(run):null;
+ if(pen&&rng(run)<0.5)opts.push({t:'pen',k:pen});else opts.push({t:'train'});return opts;}
+// i: 選んだ番号(-1で飛ばす)。arg: 交代する駒・特訓する駒・入れ替えるペンの番号
+function takeReward(run,i,arg){const R=run.reward;if(!R||R.took)return false;
+ if(i>=0){const o=R.opts[i];if(!o)return false;
+  if(o.t==='piece'){if(!(arg>=0&&arg<run.pieces.length))return false;addPiece(run,o.k,arg);}
+  else if(o.t==='train'){const p=run.pieces[arg];if(!p||p.lv>=3)return false;p.lv++;}
+  else if(o.t==='pen'){if(run.pens.length<3)run.pens.push(o.k);else{if(!(arg>=0&&arg<3))return false;run.pens[arg]=o.k;}}}
+ R.took=true;if(!R.stickers||R.stickerTook)finishReward(run);return true;}
+function takeSticker(run,i){const R=run.reward;if(!R||!R.stickers||R.stickerTook)return false;if(i>=0){const k=R.stickers[i];if(!k)return false;addSticker(run,k);}
+ R.stickerTook=true;if(R.took||!R.opts.length)finishReward(run);return true;}
+function finishReward(run){const R=run.reward;run.reward=null;run.b=null;
+ if(R&&R.kind==='boss'){if(run.ch>=CHAPTERS.length-1){run.phase='clear';return;}run.ch++;genMap(run);run.phase='chapter';return;}
+ nodeDone(run);}
+
+/* ---------- 購買部・保健室 ---------- */
+function price(run,p){return Math.round(p*(has(run,'origami')?0.8:1));}
+function genShop(run){const items=[];const w=[0,8,6,2];
+ const p1=randPiece(run,w),p2=randPiece(run,w,[p1]);for(const k of[p1,p2])items.push({t:'piece',k,price:price(run,[0,40,55,80][PIECES[k].rar])});
+ const pen=randPen(run);if(pen)items.push({t:'pen',k:pen,price:price(run,50)});
+ for(const k of stickerOpts(run,2))items.push({t:'sticker',k,price:price(run,STICKERS[k].p)});
+ items.push({t:'bread',price:price(run,25)});items.push({t:'train',price:price(run,50)});
+ run.shop={items};run.phase='shop';}
+function buy(run,i,arg){const it=run.shop&&run.shop.items[i];if(!it||it.sold||run.money<it.price)return false;
+ if(it.t==='piece'){if(!(arg>=0&&arg<run.pieces.length))return false;addPiece(run,it.k,arg);}
+ else if(it.t==='pen'){if(run.pens.length<3)run.pens.push(it.k);else{if(!(arg>=0&&arg<3))return false;run.pens[arg]=it.k;}}
+ else if(it.t==='sticker')addSticker(run,it.k);
+ else if(it.t==='bread'){if(run.hp>=run.maxHp)return false;heal(run,10);}
+ else if(it.t==='train'){const p=run.pieces[arg];if(!p||p.lv>=3)return false;p.lv++;}
+ run.money-=it.price;it.sold=true;return true;}
+function rest(run,what,arg){if(run.phase!=='rest')return false;
+ if(what==='heal')heal(run,Math.ceil(run.maxHp*0.3));
+ else if(what==='train'){const p=run.pieces[arg];if(!p||p.lv>=3)return false;p.lv++;}
+ else return false;nodeDone(run);return true;}
+function swapLineup(run,i,j){if(i===j||!run.pieces[i]||!run.pieces[j])return false;const t=run.pieces[i];run.pieces[i]=run.pieces[j];run.pieces[j]=t;return true;}
+
+/* ---------- 出来事 ---------- */
+// need:'piece' は駒を1つ選ぶ(特訓など)。f は結果の文
+const EVENTS={
+ sekigae:{t:'席替え',d:'先生が「席替えをします」と言った。くじで決めるらしい。',o:[
+  {l:'くじを引く',d:'駒の並びがばらばらになる。おこづかい+15円',f:run=>{run.pieces=shuffle(run,run.pieces);run.money+=15;return'並びが変わった。くじを引いたお礼に、おこづかいを15円もらった。';}},
+  {l:'今の席がいい',d:'何も起きない',f:()=>'先生は「今回だけですよ」と笑った。'}]},
+ okawari:{t:'給食のおかわりじゃんけん',d:'残ったプリンは1つ。おかわりじゃんけんが始まった。',o:[
+  {l:'じゃんけんする',d:'勝てばHP+12。負けると何もなし',f:run=>{if(rng(run)<0.5){heal(run,12);return'勝った! プリンでHPが12戻った。';}return'負けた…。';}},
+  {l:'ゆずる',d:'HP+4',f:run=>{heal(run,4);return'ゆずった気持ちよさで、HPが4戻った。';}}]},
+ test:{t:'抜き打ちテスト',d:'わからない問題がある。鉛筆を転がして決めようか。',o:[
+  {l:'鉛筆を転がす',d:'1〜2でHP-6、3〜4で+12円、5〜6でシール1枚',f:run=>{const n=rint(run,1,6);if(n<=2){run.hp=Math.max(1,run.hp-6);return`${n}が出た。赤点で、HPが6減った。`;}
+    if(n<=4){run.money+=12;return`${n}が出た。まあまあの点。おこづかい+12円。`;}const s=stickerOpts(run,1)[0];if(s){addSticker(run,s);return`${n}が出た。百点! 「${STICKERS[s].n}」のシールをもらった。`;}run.money+=20;return`${n}が出た。百点! おこづかい+20円。`;}},
+  {l:'ちゃんと考える',d:'HP-3。駒を1つ特訓',need:'piece',f:(run,arg)=>{run.hp=Math.max(1,run.hp-3);const p=run.pieces[arg];if(p&&p.lv<3)p.lv++;return'頭を使って疲れたけれど、ひとつ賢くなった。';}}]},
+ otoshimono:{t:'落とし物の消しゴム',d:'廊下に、名前の書いてある消しゴムが落ちていた。',o:[
+  {l:'先生に届ける',d:'おこづかい+20円',f:run=>{run.money+=20;return'先生にほめられて、おこづかいを20円もらった。';}},
+  {l:'もらっておく',d:'シールを1枚。HP-5',f:run=>{const s=stickerOpts(run,1)[0];run.hp=Math.max(1,run.hp-5);if(s){addSticker(run,s);return`カバーの中に「${STICKERS[s].n}」のシールがあった。でも胸が痛む。HP-5。`;}return'胸が痛む。HP-5。';}}]},
+ zukou:{t:'図工の時間',d:'絵の具と画用紙。何を描こう。',o:[
+  {l:'駒を描き直す',d:'駒が1つ、めずらしい駒に変わる(どれかは選べない)',f:run=>{const i=rint(run,0,run.pieces.length-1);const old=PIECES[run.pieces[i].k].n;const k=randPiece(run,[0,0,6,3],[run.pieces[i].k]);const lv=run.pieces[i].lv;addPiece(run,k,i);run.pieces[i].lv=lv;return`${old}を描き直したら、${PIECES[k].n}になった。`;}},
+  {l:'ペンで遊ぶ',d:'ペンを1本もらう(筆箱がいっぱいなら+15円)',f:run=>{const p=run.pens.length<3?randPen(run):null;if(p){run.pens.push(p);return`「${PENS[p].n}」を筆箱に入れた。`;}run.money+=15;return'筆箱がいっぱいなので、おこづかい+15円にした。';}}]},
+ usagi:{t:'飼育小屋のうさぎ',d:'うさぎがこっちを見ている。',o:[
+  {l:'えさをやる',d:'HP+8',f:run=>{heal(run,8);return'もぐもぐ食べる姿に元気をもらった。HP+8。';}},
+  {l:'小屋をそうじする',d:'HP-4。おこづかい+25円',f:run=>{run.hp=Math.max(1,run.hp-4);run.money+=25;return'くたくたになったけど、先生からおこづかい+25円。';}}]},
+ rika:{t:'理科の実験',d:'試験管が2本。混ぜたらどうなるだろう。',o:[
+  {l:'混ぜてみる',d:'半分の確率で駒を1つ特訓。外れるとHP-6',need:'piece',f:(run,arg)=>{if(rng(run)<0.5){const p=run.pieces[arg];if(p&&p.lv<3)p.lv++;return'きれいな色に変わった! 駒が1つ強くなった。';}run.hp=Math.max(1,run.hp-6);return'ぼふん! 煙が出て、HPが6減った。';}},
+  {l:'見ているだけ',d:'何も起きない',f:()=>'先生の実験を見ていた。'}]},
+ housou:{t:'放送室',d:'お昼の放送の当番になった。',o:[
+  {l:'好きな曲をかける',d:'次の戦闘だけ、全員の攻+2',f:run=>{run.flags.buff=2;return'みんなノリノリ。次の戦闘は攻+2。';}},
+  {l:'落とし物のお知らせ',d:'おこづかい+10円',f:run=>{run.money+=10;return'持ち主からお礼に10円もらった。';}}]},
+ nicchoku:{t:'日直',d:'今日は日直だ。',o:[
+  {l:'花に水をやる',d:'次の戦闘だけ、毎ターン筆+1',f:run=>{run.flags.stroke=1;return'花が元気になった。次の戦闘は毎ターン筆+1。';}},
+  {l:'学級日誌を書く',d:'駒を1つ特訓。おこづかい-10円',need:'piece',f:(run,arg)=>{const p=run.pieces[arg];if(p&&p.lv<3)p.lv++;run.money=Math.max(0,run.money-10);return'日誌にていねいに書いた。駒が1つ強くなった(ノート代10円)。';}}]},
+ hanaichi:{t:'花いちもんめ',d:'「あの子がほしい」。となりのクラスが、駒を1つ取り替えようと言ってきた。',o:[
+  {l:'取り替える',d:'駒が1つ、べつの駒になる(Lvは同じ)',f:run=>{const i=rint(run,0,run.pieces.length-1);const lv=run.pieces[i].lv,old=PIECES[run.pieces[i].k].n;const k=randPiece(run,[0,6,6,3],[run.pieces[i].k]);addPiece(run,k,i);run.pieces[i].lv=lv;return`${old}と${PIECES[k].n}を取り替えた。`;}},
+  {l:'「相談しよう」',d:'何も起きない',f:()=>'相談がまとまらないうちに、チャイムが鳴った。'}]},
+};
+const EVENT_KEYS=Object.keys(EVENTS);
+function startEvent(run){let ks=EVENT_KEYS.filter(k=>!run.seen.includes(k));if(!ks.length){run.seen=[];ks=EVENT_KEYS.slice();}const k=pick(run,ks);run.seen.push(k);run.ev={k,done:null};run.phase='event';}
+function chooseEvent(run,i,arg){const ev=run.ev;if(!ev||ev.done!=null)return false;const o=EVENTS[ev.k].o[i];if(!o)return false;
+ if(o.need==='piece'&&!(run.pieces[arg]&&run.pieces[arg].lv<3))return false;ev.done=o.f(run,arg)||'';ev.pick=i;return true;}
+function eventDone(run){if(!run.ev||run.ev.done==null)return false;nodeDone(run);return true;}
+function chapterGo(run){if(run.phase==='chapter'){run.phase='map';return true;}return false;}
+// ==ENGINE END==
+
+</script>
+<script>
+// ===== 置き場の決まりごと(README の「ゲームの足し方」を参照) =====
+const GAME_ID='amida';  // フォルダ名と同じ。保存キーは必ず GAME_ID+'-' で始める
+const store={
+  get(k){try{return JSON.parse(localStorage.getItem(GAME_ID+'-'+k));}catch(e){return null;}},
+  set(k,v){try{localStorage.setItem(GAME_ID+'-'+k,JSON.stringify(v));}catch(e){}},
+  del(k){try{localStorage.removeItem(GAME_ID+'-'+k);}catch(e){}}
+};
+// トップページの箱の下に出る「最後に遊んだ日・一言・続きの有無」
+function shelfMark(note,resume){try{localStorage.setItem('shelf:'+GAME_ID,JSON.stringify({t:Date.now(),note:note||'',resume:!!resume}));}catch(e){}}
+// ホーム画面から開いたとき(アプリとして起動)は、トップページへ戻るリンクを出さない
+const STANDALONE=matchMedia('(display-mode: standalone)').matches||!!navigator.standalone;
+// ===== 落書きの絵(48×48、線は currentColor) =====
+const EYES=(x1,y1,x2,y2)=>`<circle cx="${x1}" cy="${y1}" r="1.6" class="dot"/><circle cx="${x2}" cy="${y2}" r="1.6" class="dot"/>`;
+const ART={
+ // 駒
+ samurai:`<circle cx="21" cy="28" r="10"/><path d="M15 20q6-7 12 0"/><path d="M21 15v-6"/><path d="M18 9h6"/>${EYES(17.5,28,24.5,28)}<path d="M18 33q3 2 6 0"/><path d="M33 37l11-16"/><path d="M34 31l5 3"/>`,
+ sumo:`<circle cx="24" cy="15" r="7"/><path d="M20.5 8.5q3.5-5 7 0"/>${EYES(21.5,15,26.5,15)}<path d="M11 45q-3-16 13-18q16 2 13 18"/><path d="M12.5 38.5h23"/><path d="M24 38.5v6"/>`,
+ hoken:`<circle cx="24" cy="28" r="11"/><path d="M13 21l3-9h16l3 9"/><path d="M24 13.5v5.5M21.25 16.25h5.5"/>${EYES(20,28,28,28)}<path d="M20.5 33q3.5 2.5 7 0"/>`,
+ ninja:`<circle cx="23" cy="25" r="12"/><path d="M11 22h24v7H11z"/>${EYES(18.5,25.5,27.5,25.5)}<path d="M35 23.5l9-4M35 27l9 2"/>`,
+ neko:`<path d="M12 23l1-12 8 7"/><path d="M34 23l-1-12-8 7"/><circle cx="23" cy="29" r="12"/>${EYES(18.5,28,27.5,28)}<path d="M21 33h4M23 33v2"/><path d="M38 24v-8q0-3 3-3t3 3v8"/>`,
+ yumi:`<path d="M15 5q22 19 0 38"/><path d="M15 5v38"/><path d="M6 24h34"/><path d="M35 19.5l5 4.5-5 4.5"/><path d="M8 21l-2 3 2 3"/>`,
+ yuki:`<circle cx="24" cy="34" r="10"/><circle cx="24" cy="17" r="7"/><path d="M18 10.5h12l-1.5-6h-9z"/>${EYES(21.5,17,26.5,17)}<path d="M14 30l-7-5M34 30l7-5"/>`,
+ kappa:`<circle cx="24" cy="28" r="11"/><ellipse cx="24" cy="15.5" rx="9" ry="3.2"/><path d="M14 19l-3-4M34 19l3-4"/>${EYES(19.5,27,28.5,27)}<path d="M20 32h8l-4 3z"/>`,
+ tengu:`<circle cx="19" cy="27" r="10"/><path d="M25 25l18-5-18 9"/><path d="M12.5 21l5 2.5M24.5 20.5l-4 3"/>${EYES(15.5,26.5,21.5,26.5)}<path d="M15 33q3 1.5 6 0"/>`,
+ kaminari:`<circle cx="24" cy="27" r="9"/><path d="M18.5 20l-3-9 6 6.5M29.5 20l3-9-6 6.5"/>${EYES(20.5,26.5,27.5,26.5)}<path d="M21 31q3 2 6 0"/><circle cx="24" cy="27" r="18" stroke-dasharray="3.5 4.5"/>`,
+ nurikabe:`<rect x="9" y="7" width="30" height="34" rx="3"/><path d="M9 17h30M9 31h30M24 7v10M16.5 17v14M31.5 17v14M24 31v10"/>${EYES(20,24,28,24)}<path d="M15 41v4M33 41v4"/>`,
+ daruma:`<path d="M24 5c-11 0-15.5 10-15.5 19.5S14 43 24 43s15.5-9 15.5-18.5S35 5 24 5z"/><ellipse cx="24" cy="21" rx="8.5" ry="7.5"/>${EYES(20.5,20.5,27.5,20.5)}<path d="M19 15.5l4 1.5M29 15.5l-4 1.5"/>`,
+ iinchou:`<circle cx="24" cy="27" r="11"/><path d="M13 22q2-11 11-11t11 11"/><circle cx="19.5" cy="27" r="3.2"/><circle cx="28.5" cy="27" r="3.2"/><path d="M22.7 27h2.6"/><path d="M21 33.5q3 1.5 6 0"/>`,
+ tanuki:`<circle cx="24" cy="29" r="11"/><path d="M14.5 22l-2-8 6.5 4.5M33.5 22l2-8-6.5 4.5"/><ellipse cx="19.5" cy="28" rx="3.6" ry="2.6"/><ellipse cx="28.5" cy="28" rx="3.6" ry="2.6"/><path d="M22.5 33h3"/><path d="M24 4q5 4 0 9q-5-5 0-9z"/>`,
+ oni:`<circle cx="24" cy="28" r="11"/><path d="M17 19.5l-3-10 6.5 6M31 19.5l3-10-6.5 6"/><path d="M18.5 25l4 1.5M29.5 25l-4 1.5"/><path d="M19 33h10M21.5 33v2.5M26.5 33v2.5"/>`,
+ hanabi:`<circle cx="24" cy="17" r="3"/><path d="M24 3v7M24 24v6M10 17h7M31 17h7M14 7l5 5M34 7l-5 5M14 27l5-5M34 27l-5-5"/><path d="M24 31v13"/><path d="M21 44h6"/>`,
+ momo:`<path d="M24 15c-11-5-17 6-15 14 2 9 10 14 15 14s13-5 15-14c2-8-4-19-15-14z"/><path d="M24 15q-2 13 0 28"/><path d="M24 15q3-9 11-9q-2 8-11 9z"/>`,
+ // 敵
+ kasu:`<path d="M6 33q4-6 8 0t8 0t8 0"/><path d="M22 23q4-6 8 0t8 0t5 0"/><path d="M9 41q3-4 6 0t6 0"/>${EYES(11,29,16,29)}${EYES(32,19,37,19)}`,
+ enpitsu:`<path d="M9 39l4-13L32 7l9 9-19 19z"/><path d="M13 26l9 9"/><path d="M9 39l2-7 5 5z" class="fillink"/><path d="M29 10l9 9"/>${EYES(21,21,26,26)}`,
+ keshigomu:`<rect x="7" y="15" width="34" height="19" rx="3"/><path d="M20 15v19M31 15v19"/>${EYES(11.5,23,16,23)}<path d="M11.5 28q2.25 2 4.5 0"/>`,
+ jougi:`<rect x="4" y="16" width="40" height="15" rx="2"/><path d="M9 16v5M14 16v3M19 16v5M24 16v3M29 16v5M34 16v3M39 16v5"/>${EYES(18,25,26,25)}`,
+ gabyou:`<ellipse cx="24" cy="15" rx="13" ry="5.5"/><path d="M13 16v5h22v-5"/><path d="M24 21v21"/>${EYES(20,14,28,14)}`,
+ kezuri:`<rect x="7" y="13" width="27" height="26" rx="3"/><circle cx="20.5" cy="26" r="5.5"/><path d="M34 21h6V12"/><circle cx="40" cy="10" r="2.4"/>${EYES(14,19,27,19)}`,
+ hotchkiss:`<path d="M5 35h38v5H5z"/><path d="M7 32l29-13q7-2 7 4v6H7z"/>${EYES(30,25,35,24)}<path d="M8 32v3"/>`,
+ kokuban:`<rect x="5" y="14" width="38" height="13" rx="2"/><path d="M5 27h38v9H5z"/><path d="M9 31.5h30" stroke-dasharray="2 3"/><circle cx="10" cy="42" r="1"/><circle cx="17" cy="44" r="1"/><circle cx="31" cy="43" r="1"/>${EYES(18,20,30,20)}`,
+ dodge:`<circle cx="24" cy="24" r="16"/><path d="M8 24h32M24 8q-9 16 0 32M24 8q9 16 0 32"/>`,
+ tobibako:`<path d="M9 42l3-25h24l3 25z"/><path d="M11 33.5h26M11.8 25h24.4"/><rect x="13" y="9" width="22" height="7" rx="2.5"/>${EYES(19,29,29,29)}`,
+ ichirin:`<circle cx="24" cy="35" r="9"/><path d="M24 26V10"/><path d="M17 9h14"/><path d="M24 35l5-6M24 35l-5 6"/>`,
+ karasu:`<path d="M7 29q10-15 25-9l9-4-4 8q2 11-13 12q-11 0-17-7z"/><circle cx="31" cy="22" r="1.6" class="dot"/><path d="M14 36l-2 7M20 37.5v7"/><path d="M14 27q6-5 12-2"/>`,
+ tetsubou:`<path d="M8 43V11M40 43V11M8 13h32"/><path d="M3 43h10M35 43h10"/>${EYES(20,9,28,9)}`,
+ oonawa:`<path d="M7 34q17-34 34 0"/><path d="M3 34h8M37 34h8"/><path d="M14 22q10-8 20 0" stroke-dasharray="2 3"/>`,
+ scoop:`<path d="M24 4v20"/><path d="M17 4h14"/><path d="M13 24h22l-2 11q-9 9-18 0z"/>${EYES(20,29,28,29)}`,
+ chourei:`<rect x="9" y="23" width="30" height="18"/><path d="M4 41h40"/><path d="M14 23v-8h20v8"/><path d="M24 15V7"/><circle cx="24" cy="5.5" r="2.4"/>${EYES(19,31,29,31)}`,
+ jintai:`<circle cx="24" cy="10" r="6"/><path d="M13 45V25q0-7 11-7t11 7v20"/><path d="M24 18v27"/><circle cx="29" cy="28" r="3.2"/><path d="M27 35h6M27 39h5"/>${EYES(21.5,9.5,26.5,9.5)}`,
+ beethoven:`<rect x="7" y="5" width="34" height="38" rx="2"/><path d="M13 24q0-12 11-12t11 12q2 4-2 7"/><path d="M15 28q-3-5 0-10"/>${EYES(19.5,26,27.5,26)}<path d="M20 33q4-2 8 0"/>`,
+ gaikotsu:`<path d="M11 22q0-15 13-15t13 15q0 7-4 9v6H15v-6q-4-2-4-9z"/><circle cx="18.5" cy="22" r="3.4"/><circle cx="29.5" cy="22" r="3.4"/><path d="M24 26l-1.5 3h3z"/><path d="M20 37v-3.5M24 37v-3.5M28 37v-3.5"/>`,
+ kaidan:`<path d="M5 43h8v-6h7v-6h7v-6h7v-6h7v-6h4"/><path d="M5 43V13"/>${EYES(30,14,35,14)}`,
+ piano:`<rect x="5" y="13" width="38" height="23" rx="2"/><path d="M5 23h38"/><path d="M11.3 23v13M17.6 23v13M23.9 23v13M30.2 23v13M36.5 23v13"/><path d="M14.5 23v-5.5M20.8 23v-5.5M33.4 23v-5.5"/>${EYES(19,17.5,29,17.5)}`,
+ kagami:`<rect x="5" y="7" width="15" height="32" rx="7.5"/><rect x="28" y="7" width="15" height="32" rx="7.5"/><path d="M9 14l7 7M32 14l7 7"/><path d="M12.5 39v5M35.5 39v5"/>`,
+ ninomiya:`<circle cx="18" cy="11" r="5"/><path d="M18 16v15l-5 12M18 31l5 12"/><path d="M11 22h12"/><rect x="9" y="19" width="6" height="7"/><path d="M26 4v29M31 4v29M24 9h9M24 19h9M24 28h9"/>`,
+ hanako:`<path d="M12 29q0-19 12-19t12 19"/><path d="M12 29h3M33 29h3"/><path d="M15 19h18"/>${EYES(20,24,28,24)}<path d="M18 30l-3 13h18l-3-13z"/>`,
+ nanatsume:`<path d="M11 41V22q0-15 13-15t13 15v19l-4.3-3-4.3 3-4.4-3-4.3 3-4.3-3z"/><path d="M19.5 20q0-4.5 4.5-4.5t4.5 4.5q0 3.5-4.5 4.5v3.5"/><circle cx="24" cy="32" r="1.6" class="dot"/>`,
+ // ペン
+ pencil:`<path d="M8 40l4-12L33 7l8 8-21 21z"/><path d="M12 28l8 8"/><path d="M8 40l2.5-7 4.5 4.5z" class="fillink"/>`,
+ hl:`<path d="M9 39l6-6 18-18 6 6-18 18z"/><path d="M9 39l-3 3h7z" class="fillink"/><path d="M15 33l6 6"/>`,
+ brush:`<path d="M30 6l9 9-14 14-9-9z"/><path d="M16 20q-9 6-10 22q14-2 19-13"/>`,
+ ball:`<path d="M10 38l23-23 4 4-23 23z"/><path d="M10 38l-3 4 5-1"/><path d="M33 15l5-5 2 2-5 5"/>`,
+ red:`<path d="M8 40l4-12L33 7l8 8-21 21z" class="redline"/><path d="M12 28l8 8"/><path d="M8 40l2.5-7 4.5 4.5z" class="fillred"/>`,
+ ruler:`<rect x="3" y="18" width="42" height="12" rx="2"/><path d="M8 18v5M13 18v3M18 18v5M23 18v3M28 18v5M33 18v3M38 18v5"/>`,
+ tape:`<rect x="8" y="12" width="26" height="20" rx="5"/><circle cx="21" cy="22" r="4"/><path d="M34 22h8v8l-5 3"/>`,
+};
+function art(k,cls){return`<svg class="art ${cls||''}" viewBox="0 0 48 48" aria-hidden="true">${ART[k]||ART.nanatsume}</svg>`;}
+// 道中のマスの字
+const NODE_CH={battle:'戦',elite:'強',shop:'購',rest:'保',event:'?',treasure:'忘',boss:'大'};
+const NODE_NAME={battle:'たたかい',elite:'強い敵',shop:'購買部',rest:'保健室',event:'出来事',treasure:'忘れ物',boss:'ボス'};
+
+// ===== 画面 =====
+const $=s=>document.querySelector(s);
+const app=$('#app'),sheetEl=$('#sheet'),toastEl=$('#toast');
+const SVGNS='http://www.w3.org/2000/svg';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let run=store.get('run-v1');if(!run||run.v!==1||!run.phase)run=null;
+let meta=Object.assign({runs:0,clears:0,bestCh:0,kills:0,maxHit:0,tut:0,unlock:0,lastGk:'ichi'},store.get('meta-v1')||{});
+let settings=Object.assign({speed:1,theme:'auto'},store.get('settings-v1')||{});
+const ui={view:run?'title':'title',pen:'pencil',sel:-1,msg:'',busy:false,pick:null,seki:false,mapPencil:false,mapStart:-1,lineSel:-1,confirmNew:false,flash:0};
+const CH_TEXT=['放課後の教室。ノートのすみのあみだくじから、落書きたちが飛び出した。机の上では、文房具の付喪神が待ちかまえている。',
+ '夕焼けの校庭。ボールも一輪車も、勝手に動き出した。朝礼台の上で、だれかが長い話を始めようとしている。',
+ '夜の校舎。七不思議がひとつずつ目を覚ます。七つ目の不思議のことは、だれも知らない。'];
+const BOSS_OF=['kokuban','chourei','nanatsume'];
+const RPS=['グー','チョキ','パー'];
+const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SPD=()=>reduced()?0:settings.speed;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+// 「自動」のときは、最初からついていた data-theme(埋め込み先が決めたもの)に戻す
+const THEME0=document.documentElement.getAttribute('data-theme');
+function applyTheme(){const r=document.documentElement;if(settings.theme==='auto'){if(THEME0)r.setAttribute('data-theme',THEME0);else r.removeAttribute('data-theme');}else r.setAttribute('data-theme',settings.theme);}
+applyTheme();
+function save(){if(run&&run.phase!=='over'&&run.phase!=='clear')store.set('run-v1',run);else store.del('run-v1');store.set('meta-v1',meta);}
+function saveSettings(){store.set('settings-v1',settings);}
+function toast(t){toastEl.textContent=t;toastEl.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>{toastEl.hidden=true;},2400);}
+function mark(){if(!run){return;}if(run.phase==='over')shelfMark(`${run.ch+1}章でゲームオーバー`,false);else if(run.phase==='clear')shelfMark('全3章クリア!',false);else shelfMark(`${run.ch+1}章・${CHAPTERS[run.ch].n}`,true);}
+
+/* ---------- 部品 ---------- */
+const MENU_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 7h14M5 12h14M5 17h14"/></svg>';
+function hud(){const w=Math.max(0,Math.round(100*run.hp/run.maxHp));
+ return`<div class="hud"><div class="hp"><span aria-hidden="true">HP</span><b><span class="vh">HP </span>${run.hp}/${run.maxHp}</b><div class="hpbar" id="hpbar"><i style="width:${w}%"></i></div></div><span class="yen">${run.money}円</span><button class="icon-btn" data-act="menu" aria-label="メニュー">${MENU_ICON}</button></div>`;}
+function sealRow(){if(!run.stickers.length)return'';return`<div class="seals">${run.stickers.map(k=>`<button class="seal" data-act="sticker" data-k="${k}">${esc(STICKERS[k].n)}</button>`).join('')}</div>`;}
+function statLine(k,lv){const D=PIECES[k],i=lv-1;return`攻${D.atk[i]} 守${D.def[i]}`;}
+function pieceCard(k,lv,extra){return`<span class="art-wrap">${art(k)}</span>`;}
+function lineupTags(act,sel,mark){return run.pieces.map((p,i)=>`<button class="piece${sel===i?' sel':''}" data-act="${act}" data-i="${i}" style="--pc:var(--p${i})" aria-label="${esc(PIECES[p.k].n)} Lv${p.lv}${mark&&mark(p)?'':''}">
+ <div class="tag">${p.lv>1?`<span class="lv">Lv${p.lv}</span>`:''}${art(p.k)}<span class="nm">${esc(PIECES[p.k].s)}</span><span class="st"><span class="a">攻${PIECES[p.k].atk[p.lv-1]}</span> <span class="d">守${PIECES[p.k].def[p.lv-1]}</span></span></div>${mark?`<span class="hurt ok">${mark(p)||''}</span>`:''}</button>`).join('');}
+
+/* ---------- 戦闘の盤 ---------- */
+const BW=360,CW=72,TP=8;let RH=38,BH=TP*2+ROWS*RH;
+// 盤の段の高さを画面の高さに合わせる(縦横の比は保ったまま、ほかの部品が1画面に収まるように)
+function fitBoard(){const W=Math.min(460,innerWidth)-28,other=470+(meta.tut<3?78:0)+((run&&run.b&&(run.pens.length||run.b.sekigae))?44:0);
+ const avail=Math.max(196,Math.min(330,innerHeight-other));RH=Math.max(26,Math.min(44,((avail-16)/ROWS)*BW/W));BH=TP*2+ROWS*RH;}
+const bx=c=>36+CW*c,by=r=>TP+RH*(r+.5);
+function rungAt(rungs,r,c){return rungs.find(x=>x.r===r&&(x.a===c||x.b===c));}
+function trailD(rungs,c0){let c=c0,d=`M${bx(c)} 0`;for(let r=0;r<ROWS;r++){const g=rungAt(rungs,r,c);if(g){const n=g.a===c?g.b:g.a;d+=`L${bx(c)} ${by(r)}L${bx(n)} ${by(r)}`;c=n;}}return d+`L${bx(c)} ${BH}`;}
+function upD(rungs,s0){let c=s0,d=`M${bx(c)} ${BH}`;for(let r=ROWS-1;r>=0;r--){const g=rungAt(rungs,r,c);if(g&&g.k!=='red'){const n=g.a===c?g.b:g.a;d+=`L${bx(c)} ${by(r)}L${bx(n)} ${by(r)}`;c=n;}}return d+`L${bx(c)} 0`;}
+function rungD(g){const y=by(g.r),x1=bx(g.a),x2=bx(g.b);
+ if(g.b-g.a===2){const xm=bx(g.a+1);return`M${x1} ${y}L${xm-10} ${y}Q${xm} ${y-14} ${xm+10} ${y}L${x2} ${y}`;}
+ const w=(((g.id||1)*37)%5-2)*0.7;return`M${x1} ${y}Q${(x1+x2)/2} ${y+w} ${x2} ${y}`;}
+function rungSVG(g,flash){const cls=g.k==='ruler'?'ruler':g.k;let s='';
+ if(g.k==='hl')s+=`<path class="wash" d="${rungD(g)}"/>`;
+ s+=`<path class="rung ${g.k==='hl'?'pencil':cls}${flash?' new-rung':''}" d="${rungD(g)}"/>`;
+ const xm=(bx(g.a)+bx(g.b))/2,y=by(g.r);
+ if(g.k==='red')s+=`<path d="M${xm-5} ${y-5}L${xm+5} ${y-5}L${xm} ${y+3}z" fill="var(--red)"/>`;
+ if(g.staple)s+=`<path class="staple-mark" d="M${bx(g.a)+8} ${y-6}v-4h10v4M${bx(g.b)-18} ${y-6}v-4h10v4"/>`;
+ return s;}
+function boardSVG(b,R,opts){opts=opts||{};let s=`<svg viewBox="0 0 ${BW} ${BH}" id="boardsvg" role="img" aria-label="あみだくじの盤">`;
+ for(let c=0;c<COLS;c++)s+=`<line class="post" x1="${bx(c)}" y1="0" x2="${bx(c)}" y2="${BH}"/>`;
+ // 駒ごとの道すじ
+ for(let c=0;c<COLS;c++)s+=`<path class="trail${ui.sel===c?' on':''}" style="stroke:var(--p${c})" d="${trailD(b.rungs,c)}"/>`;
+ for(const g of b.rungs)s+=rungSVG(g,g.id===ui.flash);
+ // 敵の予告(盤への悪さ)
+ for(const e of b.en){if(e.hp<=0||!e.intent)continue;const it=e.intent;
+  if((it.t==='line'||it.t==='staple')&&it.pos)for(const p of it.pos)s+=`<path class="ghost" ${it.t==='staple'?'style="stroke:var(--print)"':''} d="M${bx(p.a)} ${by(p.r)}L${bx(p.a+1)} ${by(p.r)}"/>`;
+  if(it.t==='erase'){const g=b.rungs.find(x=>x.id===it.target);if(g){const xm=(bx(g.a)+bx(g.b))/2,y=by(g.r);s+=`<path class="xmark" d="M${xm-6} ${y-6}l12 12M${xm+6} ${y-6}l-12 12"/>`;}}
+  if(it.t==='wipe')for(const g of b.rungs){if(g.k==='ink'||g.k==='ball'||(g.me&&has(run,'cap')))continue;const xm=(bx(g.a)+bx(g.b))/2,y=by(g.r);s+=`<path class="xmark" d="M${xm-5} ${y-5}l10 10M${xm+5} ${y-5}l-10 10"/>`;}}
+ if(!opts.still)for(let r=0;r<ROWS;r++)for(let a=0;a<COLS-1;a++)s+=`<rect class="gap" data-act="gap" data-r="${r}" data-a="${a}" x="${bx(a)+4}" y="${by(r)-RH/2}" width="${CW-8}" height="${RH}" rx="6"><title>${r+1}段目・${a+1}と${a+2}の間</title></rect>`;
+ s+=`<g id="fx"></g></svg>`;return s;}
+
+/* ---------- 戦闘の画面 ---------- */
+function intentInfo(b,e){const it=e.intent;if(!it)return{t:'',c:'etc',d:''};const m=v=>Math.round(v*(b.atkM||1));
+ switch(it.t){
+  case'atk':{let v=atkVal(b,e);const ch=e.chill&&v>0;if(ch)v=Math.floor(v/2);const two=e.w>1?'(2マス)':'';
+   return{t:`攻撃${v}${e.w>1?'×2':''}${it.move?'・移動':''}`,c:'atk',d:`${v}ダメージの攻撃${two}。同じ線を上って、着いた駒が受ける${ch?'(こごえで半分)':''}${it.move?'。攻撃のあと動く':''}`};}
+  case'def':return{t:`守り${m(it.v)}`,c:'def',d:`このターン、受けるダメージを${m(it.v)}減らす`};
+  case'line':return{t:`横槍${it.n>1?'×'+it.n:''}`,c:'etc',d:'ターンの終わりに、点線の場所へ赤い線を引く。先にすぐ隣へ線を引いておけば防げる'};
+  case'erase':return{t:'消しゴム',c:'etc',d:'ターンの終わりに、×の線を消す(印刷の線は消さない)'};
+  case'wipe':return{t:'全部消す',c:'etc',d:'ターンの終わりに、鉛筆と赤鉛筆の線を全部消す'};
+  case'staple':return{t:'ホチキス',c:'etc',d:'ターンの終わりに、点線の場所へ消せない線を打つ'};
+  case'move':return{t:'移動',c:'etc',d:'ターンの終わりに、となりの空きマスへ動く'};
+  case'run':return{t:'走る',c:'etc',d:'ターンの終わりに、2マス先へ走る'};
+  case'summon':return{t:'仲間を呼ぶ',c:'etc',d:`ターンの終わりに、空きマスへ${ENEMIES[it.k].n}を呼ぶ`};
+  case'swap':return{t:'逆上がり',c:'etc',d:`ターンの終わりに、${it.c+1}番目と${it.c+2}番目の駒の並びを入れ替える`};
+  case'sleep':return{t:`長い話・守り${m(it.v)}`,c:'def',d:`このターン守り${m(it.v)}。ターンの終わりに、ここに着いた駒を眠らせる(次のターン攻0)`};
+  case'glare':return{t:'にらむ',c:'etc',d:'ターンの終わりに、ここに着いた駒をにらむ(次のターン攻も守も0)'};}
+ return{t:'',c:'etc',d:''};}
+function pieceNote(c,R){const act=R.acts[c],out=[];
+ const hits=R.attacks.filter(a=>a.c===c);
+ for(const a of hits){if(a.miss)out.push('<span class="hurt ok">かくれた</span>');else if(a.taken>0)out.push(`<span class="hurt">−${a.taken}</span>`);else out.push('<span class="hurt ok">防ぐ</span>');}
+ if(!hits.length&&act){if(act.heal)out.push(`<span class="hurt ok">HP+${act.heal}</span>`);else if(act.coin)out.push(`<span class="hurt ok">+${act.coin}円</span>`);else if(act.shuriken)out.push(`<span class="hurt ok">手裏剣</span>`);else if(act.stroke)out.push('<span class="hurt ok">筆+1</span>');
+  else if(act.kind==='empty'&&!act.state&&R.cheer)out.push('<span class="hurt ok">応援</span>');}
+ return out.join('')||'<span class="hurt"></span>';}
+function battleView(){fitBoard();const b=run.b,R=clash(run,b),P=R.P;ui.R=R;
+ const tags=b.lineup.map((pi,c)=>{const p=run.pieces[pi],D=PIECES[p.k],st=pieceStats(run,b,c,P),act=R.acts[c];
+  const atk=act.kind==='hit'?act.atk:st.atk,up=atk>D.atk[p.lv-1],dup=st.def>D.def[p.lv-1];
+  const badge=st.state==='sleep'?'眠り':st.state==='stun'?'動けない':st.state==='used'?'使った':b.hidden===c?'かくれ':'';
+  const rps=p.rps!=null&&has(run,'janken')?`<span class="hpn">${RPS[p.rps]}</span>`:'';
+  return`<button class="piece${ui.sel===c?' sel':''}" id="pc${c}" data-act="bpiece" data-c="${c}" style="--pc:var(--p${c})" aria-label="${esc(D.n)}">
+  <div class="tag">${p.lv>1?`<span class="lv">Lv${p.lv}</span>`:''}${badge?`<span class="badge">${badge}</span>`:''}${art(p.k)}<span class="nm">${esc(D.s)}</span><span class="st"><span class="a${up?' up':''}">攻${atk}</span> <span class="d${dup?' up':''}">守${st.def}</span></span>${rps}</div>${pieceNote(c,R)}</button>`;}).join('');
+ // 敵の列
+ const occ=Array(COLS).fill(null);for(const e of b.en)if(e.hp>0)for(let s=0;s<e.w;s++)occ[e.slot+s]=e;
+ const arrive=s=>{const c=P.down.indexOf(s);return`<i style="--pc:var(--p${c})"></i>${esc(PIECES[run.pieces[b.lineup[c]].k].s)}`;};
+ let foes='';for(let s=0;s<COLS;s++){const e=occ[s];
+  if(!e){foes+=`<div class="empty-slot" data-s0="${s}" data-w="1" style="grid-column:${s+1}">空き<span class="arrive">${arrive(s)}</span></div>`;continue;}
+  if(e.slot!==s)continue;
+  const x=R.X.find(q=>q.e===e),after=Math.max(0,x?x.hp:e.hp),lost=e.hp-after,ii=intentInfo(b,e),dead=x&&!x.alive;
+  const arr=[];for(let k=0;k<e.w;k++)arr.push(arrive(s+k));
+  foes+=`<button class="foe on" data-act="foe" data-id="${e.id}" data-s0="${s}" data-w="${e.w}" style="grid-column:${s+1} / span ${e.w}" aria-label="${esc(enemyName(e))} HP${e.hp}">
+  <div class="card">${lost>0||dead?`<span class="pred${dead?' kill':''}">${dead?'たおす':'−'+lost}</span>`:''}${art(e.k)}<span class="nm">${esc(enemyName(e))}</span>
+  <div class="ehp" style="width:${e.w>1?'92%':'86%'}"><i style="width:${100*after/e.max}%"></i><s style="left:${100*after/e.max}%;width:${100*lost/e.max}%"></s></div><span class="hpn">${e.hp}/${e.max}${e.chill?' こごえ':''}${e.rps!=null&&has(run,'janken')?' '+RPS[e.rps]:''}</span>
+  <span class="intent ${ii.c}">${esc(ii.t)}</span></div><span class="arrive">${arr.join(' ')}</span></button>`;}
+ const pens=[`<button class="pen${ui.pen==='pencil'?' on':''}" data-act="pen" data-k="pencil" aria-pressed="${ui.pen==='pencil'}">${art('pencil')}鉛筆</button>`].concat(run.pens.map(k=>{const u=b.penUses[k]||0;return`<button class="pen${ui.pen===k?' on':''}" data-act="pen" data-k="${k}" aria-pressed="${ui.pen===k}" ${u>0?'':'disabled'}>${art(k)}${esc(PENS[k].n)}<em>${u}</em></button>`;}));
+ if(b.sekigae>0)pens.push(`<button class="pen${ui.seki?' on':''}" data-act="seki" aria-pressed="${ui.seki}">席替え<em>1</em></button>`);
+ let strokes='';const tot=Math.max(b.strokes,STROKES);for(let i=0;i<tot;i++)strokes+=`<span class="${i<b.strokes?'':'used'}">${art('pencil')}</span>`;
+ const hint=meta.tut<3?tutorial():'';
+ const sum=`<div class="sum" aria-label="見込み"><span class="give">与える ${R.dealt}</span><span class="take">受ける ${R.taken}</span>${R.heal?`<span class="heal">回復 ${R.heal}</span>`:''}${R.cheer?`<span>応援 +${R.cheer}</span>`:''}${R.kills.length?`<span class="give">たおす ${R.kills.length}</span>`:''}</div>`;
+ const turnInfo=`${b.kind==='boss'?'ボス戦':b.kind==='elite'?'強い敵':'たたかい'}・${b.turn}ターン目${b.turn>(b.kind==='boss'?CHIME+4:CHIME)?'・チャイム':''}`;
+ return`<div class="battle" id="battle">${hud()}<div class="where"><span>${run.ch+1}章 ${esc(CHAPTERS[run.ch].n)}・${turnInfo}</span>${b.roll?`<span>鉛筆転がし: ${b.roll}</span>`:''}</div>
+ <div class="row5">${tags}</div>
+ <div class="board">${boardSVG(b,R)}</div>
+ <div class="row5 foes">${foes}</div>
+ ${sum}<p class="msg" id="msg">${ui.msg||defaultMsg(b)}</p>${hint}
+ <div class="dock">${pens.length>1?`<div class="pens">${pens.join('')}</div>`:''}
+ <div class="actions"><span class="strokes" aria-label="筆の残り${b.strokes}">筆${strokes}</span><button class="btn quiet" data-act="undo" ${b.edits.length?'':'disabled'}>元に戻す</button><button class="btn go" data-act="go">せーの!</button></div></div></div>`;}
+function defaultMsg(b){if(ui.pen!=='pencil'&&PENS[ui.pen])return`<b>${esc(PENS[ui.pen].n)}</b>: ${esc(PENS[ui.pen].d)}`;
+ if(ui.seki)return'<b>席替え</b>: 入れ替える駒をタップ(右どなりと入れ替わる)';
+ if(b.strokes>0)return`縦線のあいだをタップすると横線が引ける。のこり<b>${b.strokes}本</b>`;return'筆を使い切った。よければ「せーの!」';}
+function tutorial(){const T=['上の駒は線を下へたどって、着いたマスの敵を攻撃する。敵の攻撃は<b>同じ線を上って</b>その駒に来る。',
+ '縦線のあいだをタップすると横線が引ける(1ターンに2本)。もう一度タップで取り消し。',
+ '赤い攻撃には力士(守)を、倒せる敵には侍(攻)を当てよう。空きマスに着いた駒は<b>応援</b>で味方の攻を上げる。'];
+ return`<div class="hint"><p>${T[meta.tut]}</p><button class="btn quiet" data-act="tut">${meta.tut<2?'つぎへ':'わかった'}</button></div>`;}
+
+/* ---------- 戦闘の操作 ---------- */
+function swappedNames(before,after){const ch=[];for(let c=0;c<COLS;c++)if(before[c]!==after[c])ch.push(c);
+ return ch.map(c=>PIECES[run.pieces[run.b.lineup[c]].k].s).join('と');}
+function tapGap(r,a){const b=run.b,before=paths(b).down.slice();
+ const g=b.rungs.find(x=>x.r===r&&x.a<=a&&x.b>=a+1);
+ if(g){const res=eraseRung(run,g.id,ui.pen==='tape'?'tape':undefined);
+  if(!res.ok){ui.msg=esc(res.why);}
+  else{const nm=swappedNames(before,paths(b).down);ui.msg=res.undo?`線を取り消した${nm?`。${esc(nm)}の行き先が戻った`:''}`:`線を消した${nm?`。${esc(nm)}の行き先が入れ替わった`:''}`;if(ui.pen==='tape')ui.pen='pencil';}}
+ else{if(ui.pen==='tape'){ui.msg='修正テープは、消したい線をタップして使う';render();return;}
+  const res=drawRung(run,r,a,ui.pen);
+  if(!res.ok)ui.msg=esc(res.why);
+  else{ui.flash=res.g.id;const nm=swappedNames(before,paths(b).down);ui.msg=nm?`<b>${esc(nm)}</b>の行き先が入れ替わった`:'線を引いた';if(ui.pen!=='pencil'&&!(b.penUses[ui.pen]>0))ui.pen='pencil';}}
+ save();render();ui.flash=0;}
+function trailFor(c){return trailD(run.b.rungs,c);}
+async function doCommit(){if(ui.busy||!run.b)return;ui.busy=true;
+ const snap=JSON.parse(JSON.stringify(run.b)),names={};for(const e of snap.en)names[e.id]=enemyName(e);
+ const lineupNames=snap.lineup.map(pi=>PIECES[run.pieces[pi].k].s);
+ const R=commit(run);
+ for(const e of(run.b?run.b.en:[]))names[e.id]=names[e.id]||enemyName(e);
+ try{await animateClash(snap,R);}catch(e){}
+ meta.maxHit=Math.max(meta.maxHit,R.big||0);
+ ui.busy=false;ui.pen='pencil';ui.sel=-1;ui.seki=false;
+ if(run.phase==='battle'){ui.msg=afterText(R.after||[],names,lineupNames,R)||'';}
+ else ui.msg='';
+ if(run.phase==='over')endRun();
+ save();mark();render();}
+function afterText(log,names,ln,R){const out=[];
+ if(R.taken>0&&R.reflect)out.push(`鏡の返しで${R.reflect}ダメージ`);
+ for(const l of log){const n=esc(names[l.id]||'敵');
+  if(l.t==='line')out.push(`${n}が横槍の線を引いた`);else if(l.t==='blocked')out.push(`${n}の横槍は入らなかった`);
+  else if(l.t==='erase')out.push(`${n}が線を1本消した`);else if(l.t==='wipe')out.push(`${n}が線を${l.n}本消した`);
+  else if(l.t==='staple')out.push(`${n}が消せない線を打った`);else if(l.t==='move')out.push(`${n}が動いた`);
+  else if(l.t==='summon')out.push(`${n}が仲間を呼んだ`);else if(l.t==='swap')out.push(`${n}の逆上がりで、駒の並びが入れ替わった`);
+  else if(l.t==='sleep')out.push(`長い話で${esc(ln[l.c])}が眠ってしまった`);else if(l.t==='glare')out.push(`${esc(ln[l.c])}がにらまれて動けない`);
+  else if(l.t==='phase')out.push(`${n}の姿が変わった`);}
+ const uniq=[...new Set(out)];return uniq.join('。')+(uniq.length?'。':'');}
+function slotEl(s){for(const el of document.querySelectorAll('.foes [data-s0]')){const s0=+el.dataset.s0,w=+el.dataset.w;if(s>=s0&&s<s0+w)return el;}return null;}
+function pop(el,text,cls){if(!el)return;const host=$('#battle');if(!host)return;const hr=host.getBoundingClientRect(),r=el.getBoundingClientRect();
+ const d=document.createElement('div');d.className='pop '+cls;d.textContent=text;d.style.left=(r.left-hr.left+r.width/2)+'px';d.style.top=(r.top-hr.top+Math.min(r.height*0.4,40))+'px';host.appendChild(d);
+ const dur=Math.max(650,1000*(SPD()||0.6));d.animate([{transform:'translate(-50%,-20%)',opacity:0},{transform:'translate(-50%,-60%)',opacity:1,offset:.18},{transform:'translate(-50%,-130%)',opacity:0}],{duration:dur,easing:'ease-out'}).onfinish=()=>d.remove();}
+function trace(d,color,dur){const svg=$('#boardsvg');if(!svg)return Promise.resolve();const fx=svg.querySelector('#fx');const p=document.createElementNS(SVGNS,'path');p.setAttribute('d',d);p.setAttribute('class','fx-path');p.style.stroke=color;fx.appendChild(p);
+ const L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L;
+ if(!dur){p.style.strokeDashoffset=0;return Promise.resolve();}
+ return p.animate([{strokeDashoffset:L},{strokeDashoffset:0}],{duration:dur,easing:'ease-in-out',fill:'forwards'}).finished;}
+async function animateClash(snap,R){const sp=SPD();
+ document.querySelectorAll('.gap').forEach(g=>g.remove());
+ const go=$('[data-act="go"]');if(go)go.disabled=true;
+ if(sp){const ps=[];for(let c=0;c<COLS;c++){const st=R.acts[c];if(st&&st.kind==='stun')continue;ps.push(trace(trailD(snap.rungs,c),`var(--p${c})`,650*sp));}await Promise.all(ps);}
+ for(const a of R.acts){const el=slotEl(a.slot);
+  if(a.kind==='hit'){if(a.dmg>0)pop(el,`−${a.dmg}`,'dmg');else pop(el,'防がれた','info');}
+  else if(a.kind==='empty'){if(a.heal)pop($('#hpbar'),`+${a.heal}`,'heal');else if(a.coin)pop(document.querySelector('.yen'),`+${a.coin}円`,'heal');else if(a.shuriken){pop(slotEl(snap.en.find(e=>e.id===a.shuriken.id)?.slot??a.slot),`−${a.shuriken.dmg}`,'dmg');}}
+  if(a.splash)for(const sp2 of a.splash){const e=snap.en.find(x=>x.id===sp2.id);if(e)pop(slotEl(e.slot),`−${sp2.dmg}`,'dmg');}}
+ for(const x of R.extra||[]){const e=snap.en.find(q=>q.id===x.to);if(e)pop(slotEl(e.slot),`−${x.dmg}`,'dmg');}
+ for(const id of R.kills){const e=snap.en.find(x=>x.id===id);const el=e&&slotEl(e.slot);if(el)el.classList.add('dead');}
+ if(sp)await sleep(420*sp);
+ if(R.attacks.length){if(sp){await Promise.all(R.attacks.map(a=>trace(upD(snap.rungs,a.slot),'var(--red)',480*sp)));}
+  for(const a of R.attacks){const el=$('#pc'+a.c);if(a.miss)pop(el,'かわした','info');else if(a.taken>0)pop(el,`−${a.taken}`,'hurt');else pop(el,'防いだ','heal');}
+  if(R.taken>0){const hb=$('#hpbar');if(hb){hb.classList.remove('shake');void hb.offsetWidth;hb.classList.add('shake');}}
+  if(sp)await sleep(560*sp);}
+ else if(sp)await sleep(200*sp);
+ if(R.won){toast('勝った!');if(sp)await sleep(300*sp);}}
+
+/* ---------- 道中 ---------- */
+const MW=360,MCW=72,LY=l=>44+l*66,RY=r=>(LY(r)+LY(r+1))/2,BOSSY=LY(LEVELS-1)+70,MH=BOSSY+34;
+const mx=c=>36+MCW*c;
+function routeD(m,c,from){let d=`M${mx(c)} ${from<0?14:LY(from)}`;const start=Math.max(0,from);if(from<0)d+=`L${mx(c)} ${LY(0)}`;
+ for(let l=start;l<LEVELS-1;l++){const n=routeNext(m,l,c);d+=`L${mx(c)} ${RY(l)}L${mx(n)} ${RY(l)}L${mx(n)} ${LY(l+1)}`;c=n;}return d+`L${mx(c)} ${BOSSY-20}`;}
+function mapView(){const m=run.map,started=m.lvl>=0,sc=started?m.col:ui.mapStart;
+ let s=`<svg viewBox="0 0 ${MW} ${MH}" role="img" aria-label="道中あみだ">`;
+ for(let c=0;c<COLS;c++)s+=`<line class="post" x1="${mx(c)}" y1="14" x2="${mx(c)}" y2="${BOSSY-20}"/>`;
+ if(sc>=0)s+=`<path class="way" d="${routeD(m,sc,started?m.lvl:-1)}"/>`;
+ for(const g of m.rungs)s+=`<line class="rr${g.me?' me':''}" x1="${mx(g.a)}" y1="${RY(g.r)}" x2="${mx(g.b)}" y2="${RY(g.r)}"/>`;
+ const onPath=new Set();if(sc>=0){let c=sc;for(let l=Math.max(0,started?m.lvl:0);l<LEVELS;l++){onPath.add(l+':'+c);if(l<LEVELS-1)c=routeNext(m,l,c);}}
+ const done=new Set(m.done.map(([l,c])=>l+':'+c));
+ for(let l=0;l<LEVELS;l++)for(let c=0;c<COLS;c++){const t=m.nodes[l][c],k=l+':'+c;
+  const cls=['node',t==='elite'?'elite':'',done.has(k)?'done':'',started&&l===m.lvl&&c===m.col?'here':'',onPath.has(k)&&!(started&&l===m.lvl)?'on':''].filter(Boolean).join(' ');
+  s+=`<g class="${cls}" data-act="node" data-l="${l}" data-c="${c}" style="cursor:pointer"><circle cx="${mx(c)}" cy="${LY(l)}" r="17"/><text x="${mx(c)}" y="${LY(l)+1}">${NODE_CH[t]}</text><title>${NODE_NAME[t]}</title></g>`;}
+ s+=`<g class="node${started?'':''}"><rect x="12" y="${BOSSY-18}" width="${MW-24}" height="40" rx="12" fill="var(--card)" stroke="var(--red)" stroke-width="2.2"/><text x="${MW/2}" y="${BOSSY+2}" style="fill:var(--red)">ボス: ${esc(ENEMIES[BOSS_OF[run.ch]].n)}</text></g>`;
+ if(!started)for(let c=0;c<COLS;c++)s+=`<g class="start${ui.mapStart===c?' on':''}" data-act="start" data-c="${c}"><rect x="${mx(c)-30}" y="0" width="60" height="${LY(0)+18}"/><path d="M${mx(c)-8} 6h16l-8 10z"/></g>`;
+ if(ui.mapPencil&&m.pencil>0)for(let r=Math.max(0,m.lvl);r<ROUTE_ROWS;r++)for(let a=0;a<COLS-1;a++){if(!routeCanPut(m,r,a))continue;s+=`<rect class="gap" data-act="rgap" data-r="${r}" data-a="${a}" x="${mx(a)+18}" y="${RY(r)-14}" width="${MCW-36}" height="28" rx="6" style="fill:var(--blue-soft)"/>`;}
+ s+=`</svg>`;
+ let next='';
+ if(!started){if(ui.mapStart<0)next=`<div class="next-card"><div class="stamp">↓</div><div><h3>出発する縦線をえらぶ</h3><p>上の▼をタップすると、通るマスが光る。</p></div></div>`;
+  else{const t=m.nodes[0][ui.mapStart];next=`<div class="next-card"><div class="stamp">${NODE_CH[t]}</div><div><h3>最初は${NODE_NAME[t]}</h3><p>この線を下りていく。</p></div></div>`;}}
+ else{const atBoss=m.lvl>=LEVELS-1;const nc=atBoss?-1:routeNext(m,m.lvl,m.col),t=atBoss?'boss':m.nodes[m.lvl+1][nc];
+  next=`<div class="next-card"><div class="stamp" style="${t==='elite'||t==='boss'?'color:var(--red)':''}">${NODE_CH[t]}</div><div><h3>次は${NODE_NAME[t]}${t==='boss'?`: ${esc(ENEMIES[BOSS_OF[run.ch]].n)}`:''}</h3><p>${esc(nodeHint(t))}</p></div></div>`;}
+ const pencilBtn=m.pencil>0?`<button class="btn quiet${ui.mapPencil?' on':''}" data-act="mpencil" aria-pressed="${ui.mapPencil}">${ui.mapPencil?'やめる':'道中の鉛筆'} <em style="font-style:normal">${m.pencil}</em></button>`:'';
+ const goBtn=!started?`<button class="btn go" data-act="mstart" ${ui.mapStart<0?'disabled':''}>ここから出発</button>`:`<button class="btn go" data-act="advance">進む</button>`;
+ const msg=ui.mapPencil?'光っている所をタップすると、横線を1本足せる(この章で1回)':ui.lineSel>=0?'入れ替える相手の駒をタップ':'駒を2つタップすると並びを入れ替えられる';
+ return`<div class="screen" style="gap:4px">${hud()}<div class="where"><span class="chap">${run.ch+1}章 ${esc(CHAPTERS[run.ch].n)}</span>${sealRow()}</div>
+ <div class="lineup">${lineupTags('lpiece',ui.lineSel)}</div><p class="msg">${ui.msg||msg}</p>
+ <div class="route">${s}</div>${next}
+ <div class="legend">${['battle','elite','shop','rest','event','treasure'].map(t=>`<span><b>${NODE_CH[t]}</b>${NODE_NAME[t]}</span>`).join('')}</div>
+ <div class="dock"><div class="actions">${pencilBtn}${goBtn}</div></div></div>`;}
+function nodeHint(t){return{battle:'ふつうの敵。勝つとおこづかいとごほうび',elite:'強い敵。勝つとシールももらえる',shop:'駒・ペン・シール・給食パンを買える',rest:'HPを戻すか、駒を特訓する',event:'学校の出来事。何が起きるかはお楽しみ',treasure:'だれかの忘れ物。シールが1枚手に入る',boss:'この章のボス。勝つとHPが半分戻る'}[t]||'';}
+
+/* ---------- ごほうび・購買部・保健室・出来事 ---------- */
+function optCard(o,i,act,extra){if(o.t==='piece'){const D=PIECES[o.k];return`<button class="choice" data-act="${act}" data-i="${i}">${art(o.k)}<span class="tx"><span class="kind">新しい駒${['','','・めずらしい','・とてもめずらしい'][D.rar]}</span><h3>${esc(D.n)}</h3><p>${statLine(o.k,1)}${pieceDesc(o.k,1)?'。'+esc(pieceDesc(o.k,1)):''}</p></span>${extra||''}</button>`;}
+ if(o.t==='train')return`<button class="choice" data-act="${act}" data-i="${i}">${art('daruma')}<span class="tx"><span class="kind">特訓</span><h3>駒を1つ鍛える</h3><p>選んだ駒のLvが1上がる(最大3)</p></span>${extra||''}</button>`;
+ if(o.t==='pen')return`<button class="choice" data-act="${act}" data-i="${i}">${art(o.k)}<span class="tx"><span class="kind">ペン(1戦闘に${PENS[o.k].u}回)</span><h3>${esc(PENS[o.k].n)}</h3><p>${esc(PENS[o.k].d)}</p></span>${extra||''}</button>`;
+ if(o.t==='sticker')return`<button class="choice" data-act="${act}" data-i="${i}">${sealArt()}<span class="tx"><span class="kind">シール</span><h3>${esc(STICKERS[o.k].n)}</h3><p>${esc(STICKERS[o.k].d)}</p></span>${extra||''}</button>`;
+ if(o.t==='bread')return`<button class="choice" data-act="${act}" data-i="${i}">${breadArt()}<span class="tx"><span class="kind">給食パン</span><h3>HPを10戻す</h3><p>いまHP${run.hp}/${run.maxHp}</p></span>${extra||''}</button>`;
+ return'';}
+function sealArt(){return`<svg class="art" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5l4.6 9.4 10.4 1.5-7.5 7.3 1.8 10.3L24 28.6l-9.3 4.9 1.8-10.3L9 15.9l10.4-1.5z"/><circle cx="24" cy="24" r="21" stroke-dasharray="2 4"/></svg>`;}
+function breadArt(){return`<svg class="art" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 30q0-14 16-14t16 14v6H8z"/><path d="M16 20l3 8M24 18v9M32 20l-3 8"/></svg>`;}
+function picker(text){const p=ui.pick;let body='';
+ if(p.need==='piece'||p.need==='train')body=`<div class="lineup">${lineupTags('pickpiece',-1,p.need==='train'?(q=>q.lv>=3?'Lv3':`→Lv${q.lv+1}`):null)}</div>`;
+ else if(p.need==='pen')body=`<div class="stack">${run.pens.map((k,i)=>`<button class="choice" data-act="pickpen" data-i="${i}">${art(k)}<span class="tx"><h3>${esc(PENS[k].n)}</h3><p>これと入れ替える</p></span></button>`).join('')}</div>`;
+ return`<div class="picker"><p>${text}</p>${body}<button class="link" data-act="pickcancel">やめる</button></div>`;}
+function rewardView(){const R=run.reward;let h='';
+ if(R.treasure)h+=`<h2>忘れ物を見つけた</h2><p class="lead">机の中に、シールが入っていた。1枚もらっていこう。</p>`;
+ else h+=`<h2>${R.kind==='boss'?'ボスに勝った!':'勝った!'}</h2><p class="lead">おこづかい+${R.money}円(いま${run.money}円)${R.kind==='boss'?`。HPが${run.hp}/${run.maxHp}まで戻った`:''}</p>`;
+ if(ui.pick)h+=picker(ui.pick.text);
+ else{
+  if(R.stickers&&!R.stickerTook){h+=`<h3>シールを1枚えらぶ</h3><div class="stack">${R.stickers.map((k,i)=>optCard({t:'sticker',k},i,'rsticker')).join('')}</div><button class="link" data-act="rsticker" data-i="-1">シールはいらない</button>`;}
+  else if(R.opts.length&&!R.took){h+=`<h3>ごほうびを1つえらぶ</h3><div class="stack">${R.opts.map((o,i)=>optCard(o,i,'ropt')).join('')}</div><button class="link" data-act="ropt" data-i="-1">何ももらわない</button>`;}}
+ return`<div class="screen">${hud()}${h}</div>`;}
+function shopView(){const S=run.shop;let h=`<h2>購買部</h2><p class="lead">おばちゃん「いらっしゃい。おこづかいで買っていきな」</p>`;
+ if(ui.pick)h+=picker(ui.pick.text);
+ else h+=`<div class="stack">${S.items.map((it,i)=>{const priceTag=`<span class="price">${it.sold?'売り切れ':it.price+'円'}</span>`;
+  let card=it.t==='train'?`<button class="choice" data-act="buy" data-i="${i}">${art('daruma')}<span class="tx"><span class="kind">特訓</span><h3>駒を1つ鍛える</h3><p>選んだ駒のLvが1上がる</p></span>${priceTag}</button>`:optCard(it,i,'buy',priceTag);
+  if(it.sold||run.money<it.price)card=card.replace('<button class="choice"',`<button class="choice${it.sold?' sold':''}" disabled`);return card;}).join('')}</div>
+ <button class="btn wide" data-act="leaveshop">購買部を出る</button>`;
+ return`<div class="screen">${hud()}${h}</div>`;}
+function restView(){let h=`<h2>保健室</h2><p class="lead">白いベッドと、消毒液のにおい。少しだけ休んでいこう。</p>`;
+ if(ui.pick)h+=picker(ui.pick.text);
+ else h+=`<div class="stack"><button class="choice" data-act="rheal" ${run.hp>=run.maxHp?'disabled':''}>${breadArt()}<span class="tx"><h3>ベッドで休む</h3><p>HPが${Math.ceil(run.maxHp*0.3)}戻る(いま${run.hp}/${run.maxHp})</p></span></button>
+ <button class="choice" data-act="rtrain" ${run.pieces.every(p=>p.lv>=3)?'disabled':''}>${art('daruma')}<span class="tx"><h3>特訓する</h3><p>駒を1つ選んで、Lvを1上げる</p></span></button></div>`;
+ return`<div class="screen">${hud()}${h}</div>`;}
+function eventView(){const ev=run.ev,D=EVENTS[ev.k];let h=`<h2>${esc(D.t)}</h2><p class="story">${esc(D.d)}</p>`;
+ if(ev.done!=null)h+=`<p class="result">${esc(ev.done)}</p><button class="btn go wide" data-act="evdone">つづける</button>`;
+ else if(ui.pick)h+=picker(ui.pick.text);
+ else h+=`<div class="stack">${D.o.map((o,i)=>{const dis=o.need==='piece'&&run.pieces.every(p=>p.lv>=3);return`<button class="choice" data-act="evopt" data-i="${i}" ${dis?'disabled':''}><span class="tx"><h3>${esc(o.l)}</h3><p>${esc(o.d)}</p></span></button>`;}).join('')}</div>`;
+ return`<div class="screen">${hud()}${h}</div>`;}
+function chapterView(){const prev=run.ch-1;return`<div class="screen">${hud()}<h2>${prev+1}章 クリア!</h2><p class="lead">${esc(ENEMIES[BOSS_OF[prev]].n)}をたおした。HPは${run.hp}/${run.maxHp}。</p>
+ <h3 style="margin-top:8px">${run.ch+1}章 ${esc(CHAPTERS[run.ch].n)}</h3><p class="story">${esc(CH_TEXT[run.ch])}</p><button class="btn go wide" data-act="nextch">${run.ch+1}章へ</button></div>`;}
+function endView(){const clear=run.phase==='clear',st=run.stats;
+ return`<div class="screen"><h2>${clear?'全3章クリア!':'ゲームオーバー'}</h2><p class="story">${clear?'七つ目の不思議もたおした。チャイムが鳴って、ノートの落書きたちは、また静かになった。':`${run.ch+1}章「${esc(CHAPTERS[run.ch].n)}」で力つきた。ノートのすみで、落書きたちが次の放課後を待っている。`}</p>
+ <div class="list"><div class="item"><b>学級</b><span>${esc(GAKKYU[run.gk].n)}</span></div><div class="item"><b>勝った戦闘</b><span>${st.battles}回</span></div><div class="item"><b>たおした敵</b><span>${st.kills}体</span></div><div class="item"><b>いちばん大きい一撃</b><span>${st.maxHit}</span></div>
+ <div class="item"><b>最後の駒</b><span>${run.pieces.map(p=>esc(PIECES[p.k].s)+(p.lv>1?'Lv'+p.lv:'')).join('、')}</span></div></div>
+ ${ui.unlockMsg?`<p class="result">${esc(ui.unlockMsg)}</p>`:''}
+ <button class="btn go wide" data-act="again">もう一度</button><button class="btn wide" data-act="totitle">タイトルへ</button></div>`;}
+
+/* ---------- タイトルなど ---------- */
+function logoSVG(){return`<svg class="ladder-logo" viewBox="0 0 240 120" aria-hidden="true">${[0,1,2,3,4].map(i=>`<line x1="${24+48*i}" y1="6" x2="${24+48*i}" y2="114"/>`).join('')}
+ <line class="lr" x1="24" y1="30" x2="72" y2="30"/><line class="lr" x1="120" y1="30" x2="168" y2="30"/><line class="le" x1="168" y1="54" x2="216" y2="54"/><line class="lr" x1="72" y1="62" x2="120" y2="62"/><line class="lh" x1="24" y1="86" x2="72" y2="86"/><line class="lr" x1="120" y1="94" x2="168" y2="94"/></svg>`;}
+function titleView(){const back=STANDALONE||window.AMIDA_PREVIEW?'':'<a id="shelf-link" class="link" href="../">押し入れゲーム棚へ戻る</a>';
+ const cont=run&&run.phase!=='over'&&run.phase!=='clear';
+ return`<div class="title"><div class="logo">${logoSVG()}</div><h1><ruby>一線打尽<rt>いっせんだじん</rt></ruby></h1><p class="catch">当たるも外れるも、線しだい。</p>
+ <div class="menu">${cont?`<button class="btn go" data-act="continue">つづきから<small style="display:block;font:500 12px var(--f-ui)">${run.ch+1}章・${esc(CHAPTERS[run.ch].n)}</small></button>`:''}
+ ${ui.confirmNew?`<p class="lead">遊びかけの記録は消えます。はじめからにしますか?</p><div class="row"><button class="btn" data-act="newyes">はじめから</button><button class="btn quiet" data-act="newno">やめる</button></div>`:`<button class="btn${cont?'':' go'}" data-act="new">はじめから</button>`}
+ <div class="row"><button class="btn quiet" data-act="howto">遊び方</button><button class="btn quiet" data-act="records">記録</button><button class="btn quiet" data-act="settings">設定</button></div></div>
+ <p class="foot">${back}<br>版 ${VERSION}</p></div>`;}
+function gakkyuView(){return`<div class="screen"><h2>学級をえらぶ</h2><p class="lead">はじめの5つの駒が変わる。</p><div class="stack">${Object.keys(GAKKYU).map(k=>{const G=GAKKYU[k],lock=(G.unlock||0)>meta.unlock;
+ return`<button class="choice" data-act="gk" data-k="${k}" ${lock?'disabled':''}><span class="tx"><h3>${esc(G.n)}</h3><p>${lock?`${G.unlock}回クリアすると選べる`:esc(G.d)}</p><span style="display:flex;gap:2px;margin-top:4px;color:var(--ink)">${G.pieces.map(p=>`<span style="width:30px;height:30px">${art(p)}</span>`).join('')}</span></span></button>`;}).join('')}</div>
+ <button class="btn quiet" data-act="totitle">もどる</button></div>`;}
+function howtoView(){return`<div class="screen howto"><h2>遊び方</h2>
+ <h3>あみだくじで当たる相手が決まる</h3><p>上に自分の駒が5つ、下に敵。「せーの!」で駒は線を下へたどり、着いたマスの敵に攻撃する。敵の攻撃は同じ線を上って、その駒が受ける。あみだくじなので、当たる相手はいつも1対1。</p>
+ <h3>横線を書き足す</h3><p>縦線のあいだをタップすると横線が引ける。1ターンに2本まで(筆)。前からある線をタップすると消せる(筆1)。黒い印刷の線は消せない。</p>
+ <h3>予告を見て、当てる駒を決める</h3><p>敵の下に次の行動が出ている。赤い「攻撃」には守の高い駒を、弱った敵には攻の高い駒を当てよう。見込みのダメージは、線を引くたびにその場で変わる。</p>
+ <h3>空きマスの駒は応援する</h3><p>敵のいないマスに着いた駒は応援して、敵に当たった駒の攻を1ずつ上げる。保健係や招き猫のように、空きマスで働く駒もいる。</p>
+ <h3>道中もあみだくじ</h3><p>章のはじめに出発する縦線をえらぶ。通るマスは線しだい。章に1回、道中の鉛筆で横線を足して道を変えられる。全3章、ボスを3体たおせばクリア。</p>
+ <button class="btn go" data-act="totitle">もどる</button></div>`;}
+function recordsView(){return`<div class="screen"><h2>記録</h2><div class="list"><div class="item"><b>遊んだ回数</b><span>${meta.runs}回</span></div><div class="item"><b>クリア</b><span>${meta.clears}回</span></div><div class="item"><b>いちばん進んだ章</b><span>${meta.bestCh?meta.bestCh+'章':'まだ'}</span></div><div class="item"><b>たおした敵</b><span>${meta.kills}体</span></div><div class="item"><b>いちばん大きい一撃</b><span>${meta.maxHit}</span></div></div><button class="btn quiet" data-act="totitle">もどる</button></div>`;}
+function settingsView(){const sp=[[1.5,'ゆっくり'],[1,'ふつう'],[0.55,'はやい'],[0,'なし']],th=[['auto','自動'],['light','ノート'],['dark','黒板']];
+ return`<div class="screen"><h2>設定</h2><h3>線をなぞる動き</h3><div class="seg">${sp.map(([v,l])=>`<button data-act="speed" data-v="${v}" aria-pressed="${settings.speed===v}">${l}</button>`).join('')}</div>
+ <h3>画面</h3><div class="seg">${th.map(([v,l])=>`<button data-act="theme" data-v="${v}" aria-pressed="${settings.theme===v}">${l}</button>`).join('')}</div>
+ <h3>データ</h3>${ui.confirmWipe?`<p class="lead">記録と遊びかけのデータを消します。元には戻せません。</p><div class="cols2"><button class="btn" data-act="wipeyes">消す</button><button class="btn quiet" data-act="wipeno">やめる</button></div>`:`<button class="btn quiet" data-act="wipe">記録と遊びかけのデータを消す</button>`}
+ <p class="foot">一線打尽 版 ${VERSION}</p><button class="btn" data-act="${ui.back||'totitle'}">もどる</button></div>`;}
+
+/* ---------- 描画と操作の受け付け ---------- */
+const VIEWS={title:titleView,gakkyu:gakkyuView,howto:howtoView,records:recordsView,settings:settingsView,map:mapView,battle:battleView,reward:rewardView,shop:shopView,rest:restView,event:eventView,chapter:chapterView,end:endView};
+function curView(){if(ui.view!=='game'||!run)return ui.view;return{map:'map',battle:'battle',reward:'reward',shop:'shop',rest:'rest',event:'event',chapter:'chapter',over:'end',clear:'end'}[run.phase]||'map';}
+function render(){const v=curView();app.innerHTML=(VIEWS[v]||titleView)();app.dataset.view=v;}
+function go(view){ui.view=view;ui.msg='';ui.pick=null;window.scrollTo(0,0);render();}
+function startNew(gk){run=newRun((Math.random()*2**32)>>>0,gk);meta.lastGk=gk;Object.assign(ui,{view:'game',pen:'pencil',sel:-1,msg:'',pick:null,mapStart:-1,mapPencil:false,lineSel:-1,unlockMsg:''});save();mark();window.scrollTo(0,0);render();}
+function endRun(){if(!run||run.ended)return;run.ended=true;meta.runs++;meta.kills+=run.stats.kills;meta.maxHit=Math.max(meta.maxHit,run.stats.maxHit);
+ meta.bestCh=Math.max(meta.bestCh,run.phase==='clear'?3:run.ch+1);ui.unlockMsg='';
+ if(run.phase==='clear'){meta.clears++;const before=meta.unlock;meta.unlock=Math.min(2,meta.clears);if(meta.unlock>before){const g=Object.keys(GAKKYU).find(k=>GAKKYU[k].unlock===meta.unlock);if(g)ui.unlockMsg=`新しい学級「${GAKKYU[g].n}」を選べるようになった`;}}
+ store.del('run-v1');store.set('meta-v1',meta);mark();}
+function afterNode(){ui.pick=null;ui.msg='';ui.mapPencil=false;ui.lineSel=-1;ui.pen='pencil';ui.sel=-1;
+ if(run.phase==='battle'&&run.b){const names=[...new Set(run.b.en.map(e=>enemyName(e)))];ui.msg=`${esc(names.join('、'))}があらわれた`;}
+ if(run.phase==='clear'||run.phase==='over')endRun();
+ save();mark();window.scrollTo(0,0);render();}
+function openSheet(html){sheetEl.innerHTML=`<div class="in" role="dialog" aria-modal="true">${html}<button class="btn" data-act="close">とじる</button></div>`;sheetEl.hidden=false;const b=sheetEl.querySelector('[data-act="close"]');if(b)b.focus();}
+function closeSheet(){sheetEl.hidden=true;sheetEl.innerHTML='';}
+function pieceSheet(p,extra){const D=PIECES[p.k],i=p.lv-1;let next='';if(p.lv<3)next=`<dt>特訓すると</dt><dd>Lv${p.lv+1}: ${statLine(p.k,p.lv+1)}${pieceDesc(p.k,p.lv+1)?'。'+esc(pieceDesc(p.k,p.lv+1)):''}</dd>`;
+ return`<div class="row">${art(p.k)}<div><h3>${esc(D.n)}</h3><p class="lead">Lv${p.lv}・${statLine(p.k,p.lv)}</p></div></div><dl><dt>特技</dt><dd>${esc(pieceDesc(p.k,p.lv)||'なし')}</dd>${next}${p.rps!=null&&has(run,'janken')?`<dt>じゃんけん</dt><dd>${RPS[p.rps]}</dd>`:''}${extra||''}</dl>`;}
+function enemySheet(e){const D=ENEMIES[e.k];const pats=D.phases?D.phases.map(ph=>`${ph.n}: ${ph.pat.map(patText).join(' → ')}`).join('<br>'):D.pat.map(patText).join(' → ');const tr=[];
+ if(e.w>1)tr.push('2マスぶんの大きさ。攻撃も2マスから来る');if(D.thorns)tr.push('トゲ: 当てると1ダメージ返ってくる');if(D.steal)tr.push('攻撃が通ると、おこづかいを3円取っていく');if(D.revive)tr.push(`一度だけHP${D.revive}で起き上がる`);
+ if(D.reflect||(D.phases&&reflectOf(e)))tr.push(`当てたダメージの${Math.round(100*reflectOf(e))}%が返ってくる`);if(D.hide3)tr.push('まん中(3番目)のマスにいないときは、当てても半分しか効かない');
+ const ii=intentInfo(run.b,e);
+ return`<div class="row">${art(e.k)}<div><h3>${esc(enemyName(e))}</h3><p class="lead">HP ${e.hp}/${e.max}</p></div></div><dl><dt>次の行動</dt><dd>${esc(ii.t)}: ${esc(ii.d)}</dd><dt>くり返し</dt><dd>${pats}</dd>${tr.length?`<dt>特性</dt><dd>${tr.map(esc).join('<br>')}</dd>`:''}</dl>`;}
+function patText(it){const m={atk:`攻撃${it.v}`,def:`守り${it.v}`,line:`横槍${it.n>1?'×'+it.n:''}`,erase:'消しゴム',wipe:'全部消す',staple:'ホチキス',move:'移動',run:'走る',summon:'呼ぶ',swap:'逆上がり',sleep:`長い話(守り${it.v})`,glare:'にらむ'};return(m[it.t]||it.t)+(it.move?'・移動':'')+(it.grow?`(毎回+${it.grow})`:'');}
+function menuSheet(){const inB=run&&run.phase==='battle';
+ openSheet(`<h3>シール帳</h3>${run.stickers.length?`<div class="list">${run.stickers.map(k=>`<div class="item"><b>${esc(STICKERS[k].n)}</b><span>${esc(STICKERS[k].d)}</span></div>`).join('')}</div>`:'<p class="lead">まだシールはない。強い敵や忘れ物、購買部で手に入る。</p>'}
+ <h3>筆箱</h3>${run.pens.length?`<div class="list">${run.pens.map(k=>`<div class="item"><b>${esc(PENS[k].n)}</b><span>${esc(PENS[k].d)}(1戦闘に${PENS[k].u+(has(run,'randoseru')?1:0)}回)</span></div>`).join('')}</div>`:'<p class="lead">鉛筆だけ。ペンはごほうびや購買部で手に入る。</p>'}
+ <h3>駒</h3><div class="list">${run.pieces.map(p=>`<div class="item"><b>${esc(PIECES[p.k].n)} Lv${p.lv}</b><span>${statLine(p.k,p.lv)}${pieceDesc(p.k,p.lv)?'。'+esc(pieceDesc(p.k,p.lv)):''}</span></div>`).join('')}</div>
+ <div class="cols2"><button class="btn quiet" data-act="msettings">設定</button><button class="btn quiet" data-act="mtitle">タイトルへ</button></div><p class="lead" style="font-size:12.5px">${inB?'タイトルに戻っても、このターンの始まりから続きを遊べる。':'タイトルに戻っても、続きから遊べる。'}</p>`);}
+
+const ACT={
+ new(){if(run&&run.phase!=='over'&&run.phase!=='clear'){ui.confirmNew=true;render();return;}go('gakkyu');},
+ newyes(){ui.confirmNew=false;go('gakkyu');},newno(){ui.confirmNew=false;render();},
+ continue(){ui.view='game';ui.msg='';ui.pick=null;mark();render();},
+ gk(d){startNew(d.k);},
+ howto(){go('howto');},records(){go('records');},settings(){ui.back='totitle';go('settings');},
+ totitle(){ui.confirmNew=false;go('title');},
+ speed(d){settings.speed=+d.v;saveSettings();render();},theme(d){settings.theme=d.v;saveSettings();applyTheme();render();},
+ wipe(){ui.confirmWipe=true;render();},wipeno(){ui.confirmWipe=false;render();},
+ wipeyes(){ui.confirmWipe=false;run=null;store.del('run-v1');store.del('meta-v1');meta={runs:0,clears:0,bestCh:0,kills:0,maxHit:0,tut:0,unlock:0,lastGk:'ichi'};toast('データを消した');render();},
+ menu(){menuSheet();},close(){closeSheet();},
+ msettings(){closeSheet();ui.back='backgame';ui.view='settings';render();},backgame(){ui.view='game';render();},
+ mtitle(){closeSheet();save();go('title');},
+ sticker(d){openSheet(`<h3>${esc(STICKERS[d.k].n)}</h3><p>${esc(STICKERS[d.k].d)}</p>`);},
+ tut(){meta.tut++;store.set('meta-v1',meta);render();},
+ // 戦闘
+ gap(d){if(ui.seki){ui.seki=false;}tapGap(+d.r,+d.a);},
+ pen(d){ui.pen=(ui.pen===d.k&&d.k!=='pencil')?'pencil':d.k;ui.seki=false;ui.msg='';render();},
+ seki(){ui.seki=!ui.seki;ui.pen='pencil';ui.msg='';render();},
+ undo(){if(undo(run)){ui.msg='ひとつ戻した';save();}render();},
+ go(){doCommit();},
+ bpiece(d){const c=+d.c;
+  if(ui.seki){const cc=Math.min(c,COLS-2);if(sekigae(run,cc)){ui.msg=`席替え: ${cc+1}番目と${cc+2}番目を入れ替えた`;ui.seki=false;save();}render();return;}
+  if(ui.sel===c){const b=run.b,p=run.pieces[b.lineup[c]],R=ui.R,act=R&&R.acts[c];let extra='';
+   if(act){const s=act.slot,e=b.en.find(x=>x.hp>0&&s>=x.slot&&s<x.slot+x.w);extra=`<dt>このターン</dt><dd>${e?`${esc(enemyName(e))}に当たる(攻${act.atk})`:'空きマスに着く'}</dd>`;}
+   openSheet(pieceSheet(p,extra));return;}
+  ui.sel=c;const b=run.b,R=ui.R,act=R.acts[c],s=act.slot,e=b.en.find(x=>x.hp>0&&s>=x.slot&&s<x.slot+x.w);
+  const nm=PIECES[run.pieces[b.lineup[c]].k].s,at=R.attacks.filter(a=>a.c===c);
+  ui.msg=`<b>${esc(nm)}</b>: ${e?`${esc(enemyName(e))}に攻${act.atk}`:'空きマスに着く'}${at.length?`。${at.map(a=>a.miss?'攻撃はかわす':a.taken?`攻撃を受けて−${a.taken}`:'攻撃を防ぐ').join('、')}`:''}(もう一度タップで説明)`;render();},
+ foe(d){const e=run.b.en.find(x=>x.id===+d.id);if(e)openSheet(enemySheet(e));},
+ // 道中
+ start(d){ui.mapStart=+d.c;render();},
+ mstart(){if(ui.mapStart<0)return;chooseStart(run,ui.mapStart);ui.mapStart=-1;afterNode();},
+ advance(){advance(run);afterNode();},
+ mpencil(){ui.mapPencil=!ui.mapPencil;ui.msg='';render();},
+ rgap(d){if(routePencil(run,+d.r,+d.a)){ui.mapPencil=false;ui.msg='横線を1本足した。道が変わった';save();}render();},
+ node(d){const t=run.map.nodes[+d.l][+d.c];ui.msg=`${d.l*1+1}段目: ${NODE_NAME[t]}。${esc(nodeHint(t))}`;render();},
+ lpiece(d){const i=+d.i;if(ui.lineSel<0){ui.lineSel=i;ui.msg='';render();return;}if(ui.lineSel===i){ui.lineSel=-1;openSheet(pieceSheet(run.pieces[i]));render();return;}
+  swapLineup(run,ui.lineSel,i);ui.lineSel=-1;ui.msg='並びを入れ替えた';save();render();},
+ // ごほうび
+ rsticker(d){takeSticker(run,+d.i);if(run.phase!=='reward')afterNode();else render();},
+ ropt(d){const i=+d.i;if(i<0){takeReward(run,-1);if(run.phase!=='reward')afterNode();else render();return;}
+  const o=run.reward.opts[i];
+  if(o.t==='piece')ui.pick={from:'reward',i,need:'piece',text:`${PIECES[o.k].n}と交代する駒をえらぶ`};
+  else if(o.t==='train')ui.pick={from:'reward',i,need:'train',text:'特訓する駒をえらぶ'};
+  else if(o.t==='pen'&&run.pens.length>=3)ui.pick={from:'reward',i,need:'pen',text:`筆箱がいっぱい。${PENS[o.k].n}と入れ替えるペンをえらぶ`};
+  else{takeReward(run,i);if(run.phase!=='reward')afterNode();else{save();render();}return;}
+  render();},
+ pickcancel(){ui.pick=null;render();},
+ pickpiece(d){pickDone(+d.i);},pickpen(d){pickDone(+d.i);},
+ buy(d){const it=run.shop.items[+d.i];if(!it)return;
+  if(it.t==='piece')ui.pick={from:'shop',i:+d.i,need:'piece',text:`${PIECES[it.k].n}と交代する駒をえらぶ`};
+  else if(it.t==='train')ui.pick={from:'shop',i:+d.i,need:'train',text:'特訓する駒をえらぶ'};
+  else if(it.t==='pen'&&run.pens.length>=3)ui.pick={from:'shop',i:+d.i,need:'pen',text:'筆箱がいっぱい。入れ替えるペンをえらぶ'};
+  else{if(buy(run,+d.i)){toast('買った');save();}else toast(it.t==='bread'?'HPはもういっぱい':'買えない');}
+  render();},
+ leaveshop(){nodeDone(run);afterNode();},
+ rheal(){rest(run,'heal');afterNode();},rtrain(){ui.pick={from:'rest',need:'train',text:'特訓する駒をえらぶ'};render();},
+ evopt(d){const i=+d.i,o=EVENTS[run.ev.k].o[i];if(o.need==='piece'){ui.pick={from:'event',i,need:'train',text:'どの駒にする?'};render();return;}chooseEvent(run,i,-1);save();render();},
+ evdone(){eventDone(run);afterNode();},
+ nextch(){chapterGo(run);ui.mapStart=-1;afterNode();},
+ again(){startNew(run?run.gk:meta.lastGk);},
+};
+function pickDone(arg){const p=ui.pick;if(!p)return;let ok=false;
+ if(p.need==='train'&&run.pieces[arg]&&run.pieces[arg].lv>=3){toast('この駒はもうLv3');return;}
+ if(p.from==='reward')ok=takeReward(run,p.i,arg);
+ else if(p.from==='shop')ok=buy(run,p.i,arg);
+ else if(p.from==='rest')ok=rest(run,'train',arg);
+ else if(p.from==='event')ok=chooseEvent(run,p.i,arg);
+ ui.pick=null;if(!ok){toast('えらべなかった');render();return;}
+ if(p.from==='shop'){toast('買った');save();render();return;}
+ if(p.from==='event'){save();render();return;}
+ if(run.phase==='reward'){save();render();return;}
+ afterNode();}
+app.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(!t||ui.busy)return;const f=ACT[t.dataset.act];if(!f)return;e.preventDefault();f(t.dataset,t);});
+sheetEl.addEventListener('click',e=>{if(e.target===sheetEl){closeSheet();return;}const t=e.target.closest('[data-act]');if(!t)return;const f=ACT[t.dataset.act];if(f){e.preventDefault();f(t.dataset,t);}});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!sheetEl.hidden)closeSheet();});
+if(run&&run.phase!=='over'&&run.phase!=='clear')shelfMark(`${run.ch+1}章・${CHAPTERS[run.ch].n}`,true);
+render();
+
+</script>
+<script>
+if('serviceWorker' in navigator&&location.protocol==='https:'){addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+</script>
+</body>
+</html>
